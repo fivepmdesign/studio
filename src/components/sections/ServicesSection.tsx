@@ -53,7 +53,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
       transition={{ duration: 0.6, delay: index * 0.1, ease: [0.19, 1, 0.22, 1] }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="group relative p-8 md:p-10 border border-border bg-card/50 backdrop-blur-sm transition-all duration-500 hover:bg-secondary/50 cursor-pointer"
+      className="group relative p-6 sm:p-8 md:p-10 border border-border bg-card/50 backdrop-blur-sm rounded-lg transition-all duration-500 hover:bg-secondary/50 cursor-pointer"
       style={{
         transform: isHovered ? 'perspective(1000px) rotateX(2deg) rotateY(-2deg)' : 'none',
       }}
@@ -115,7 +115,7 @@ export const ServicesSection = () => {
     <section id="services" ref={ref} className="section-padding">
       <div className="container-wide">
         {/* Header */}
-        <div className="max-w-3xl mb-16 md:mb-24">
+        <div className="max-w-3xl mb-12 md:mb-20">
           <AnimatedLine delay={0.2}>
             <span className="label text-accent mb-6 block">What We Do</span>
           </AnimatedLine>
@@ -127,7 +127,7 @@ export const ServicesSection = () => {
         </div>
 
         {/* Services Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
           {services.map((service, index) => (
             <ServiceCard key={service.title} service={service} index={index} />
           ))}

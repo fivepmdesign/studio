@@ -64,7 +64,7 @@ export const CTASection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="body-lg text-muted-foreground max-w-xl mx-auto mb-12"
+            className="body-lg text-muted-foreground max-w-lg mx-auto mb-10 sm:mb-12 px-4"
           >
             Ready to transform your digital presence? Let's discuss your next project 
             and create something extraordinary together.
@@ -74,9 +74,9 @@ export const CTASection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.8 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
+            className="flex flex-col sm:flex-row gap-4 justify-center px-4"
           >
-            <MagneticButton className="group relative px-12 py-6 bg-accent text-accent-foreground font-syne font-semibold text-lg overflow-hidden">
+            <MagneticButton className="group relative px-8 sm:px-10 md:px-12 py-5 sm:py-6 bg-accent text-accent-foreground font-syne font-semibold text-base sm:text-lg overflow-hidden rounded-lg">
               <span className="relative z-10 flex items-center gap-3">
                 Get in Touch
                 <svg
@@ -103,7 +103,7 @@ export const CTASection = () => {
               />
             </MagneticButton>
 
-            <MagneticButton className="group px-12 py-6 border border-foreground/20 font-syne font-semibold text-lg hover:border-foreground/40 transition-colors duration-300">
+            <MagneticButton className="group px-8 sm:px-10 md:px-12 py-5 sm:py-6 border border-foreground/20 font-syne font-semibold text-base sm:text-lg hover:border-foreground/40 transition-colors duration-300 rounded-lg">
               <span className="flex items-center gap-3">
                 View Our Work
                 <svg

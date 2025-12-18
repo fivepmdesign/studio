@@ -44,7 +44,7 @@ export const TestimonialsSection = () => {
     <section ref={ref} className="section-padding bg-secondary/30 overflow-hidden">
       <div className="container-wide">
         {/* Header */}
-        <div className="text-center mb-16 md:mb-24">
+        <div className="text-center mb-12 md:mb-20">
           <AnimatedLine delay={0.2}>
             <span className="label text-accent mb-6 block">Testimonials</span>
           </AnimatedLine>
@@ -56,8 +56,8 @@ export const TestimonialsSection = () => {
         </div>
 
         {/* Testimonial Carousel */}
-        <div className="relative max-w-4xl mx-auto mb-24">
-          <div className="relative h-[300px] md:h-[250px]">
+        <div className="relative max-w-4xl mx-auto mb-16 md:mb-20">
+          <div className="relative min-h-[280px] sm:min-h-[240px] md:min-h-[220px]">
             {testimonials.map((testimonial, index) => (
               <motion.div
                 key={testimonial.id}

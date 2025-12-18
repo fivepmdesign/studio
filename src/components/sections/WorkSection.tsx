@@ -108,7 +108,7 @@ export const WorkSection = () => {
     <section id="work" ref={ref} className="section-padding bg-secondary/20">
       <div className="container-wide">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-16 md:mb-24 gap-8">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12 md:mb-20 gap-6 sm:gap-8">
           <div className="max-w-2xl">
             <AnimatedLine delay={0.2}>
               <span className="label text-accent mb-6 block">Selected Work</span>
@@ -150,7 +150,7 @@ export const WorkSection = () => {
         </div>
 
         {/* Projects Grid */}
-        <div className="grid md:grid-cols-2 gap-8 md:gap-12">
+        <div className="grid sm:grid-cols-2 gap-6 sm:gap-8 md:gap-10 lg:gap-12">
           {projects.map((project, index) => (
             <ProjectCard key={project.id} project={project} index={index} />
           ))}
