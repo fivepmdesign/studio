@@ -1,20 +1,38 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { projects } from '@/data/projects';
 import { ArrowLeft } from 'lucide-react';
 import PageTransition from '@/components/PageTransition';
-import Breadcrumbs from '@/components/Breadcrumbs';
+import SearchInput from '@/components/SearchInput';
 
 const categories = ['All', ...Array.from(new Set(projects.map(p => p.category)))];
 
 const Projects = () => {
   const [activeCategory, setActiveCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = useCallback((query: string) => {
+    setSearchQuery(query.toLowerCase());
+  }, []);
 
   const filteredProjects = useMemo(() => {
-    if (activeCategory === 'All') return projects;
-    return projects.filter(p => p.category === activeCategory);
-  }, [activeCategory]);
+    let result = projects;
+    
+    if (activeCategory !== 'All') {
+      result = result.filter(p => p.category === activeCategory);
+    }
+    
+    if (searchQuery) {
+      result = result.filter(p => 
+        p.title.toLowerCase().includes(searchQuery) ||
+        p.description.toLowerCase().includes(searchQuery) ||
+        p.category.toLowerCase().includes(searchQuery)
+      );
+    }
+    
+    return result;
+  }, [activeCategory, searchQuery]);
 
   return (
     <PageTransition>
@@ -52,26 +70,36 @@ const Projects = () => {
             </p>
           </motion.div>
 
-          {/* Category Filter */}
+          {/* Search and Category Filter */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex flex-wrap gap-3 mt-12"
+            className="space-y-6 mt-12"
           >
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setActiveCategory(category)}
-                className={`px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-300 ${
-                  activeCategory === category
-                    ? 'bg-foreground text-background'
-                    : 'bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
+            {/* Search Input */}
+            <SearchInput
+              placeholder="Search projects..."
+              onSearch={handleSearch}
+              className="max-w-md"
+            />
+            
+            {/* Category Filter */}
+            <div className="flex flex-wrap gap-3">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setActiveCategory(category)}
+                  className={`px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-300 ${
+                    activeCategory === category
+                      ? 'bg-foreground text-background'
+                      : 'bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground'
+                  }`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
           </motion.div>
         </div>
       </section>

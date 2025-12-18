@@ -1,20 +1,40 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { blogPosts } from '@/data/blog';
 import PageTransition from '@/components/PageTransition';
-import Breadcrumbs from '@/components/Breadcrumbs';
+import SearchInput from '@/components/SearchInput';
+import NewsletterForm from '@/components/NewsletterForm';
 
 const categories = ['All', ...Array.from(new Set(blogPosts.map(p => p.category)))];
 
 const Blog = () => {
   const [activeCategory, setActiveCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = useCallback((query: string) => {
+    setSearchQuery(query.toLowerCase());
+  }, []);
 
   const filteredPosts = useMemo(() => {
-    if (activeCategory === 'All') return blogPosts;
-    return blogPosts.filter(p => p.category === activeCategory);
-  }, [activeCategory]);
+    let posts = blogPosts;
+    
+    if (activeCategory !== 'All') {
+      posts = posts.filter(p => p.category === activeCategory);
+    }
+    
+    if (searchQuery) {
+      posts = posts.filter(p => 
+        p.title.toLowerCase().includes(searchQuery) ||
+        p.excerpt.toLowerCase().includes(searchQuery) ||
+        p.category.toLowerCase().includes(searchQuery) ||
+        p.author.name.toLowerCase().includes(searchQuery)
+      );
+    }
+    
+    return posts;
+  }, [activeCategory, searchQuery]);
 
   const featuredPost = blogPosts.find(p => p.featured);
 
@@ -110,28 +130,38 @@ const Blog = () => {
         </section>
       )}
 
-      {/* Category Filter */}
+      {/* Search and Category Filter */}
       <section className="pb-8">
         <div className="container-wide">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-wrap gap-3"
+            className="space-y-6"
           >
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setActiveCategory(category)}
-                className={`px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-300 ${
-                  activeCategory === category
-                    ? 'bg-foreground text-background'
-                    : 'bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
+            {/* Search Input */}
+            <SearchInput
+              placeholder="Search articles..."
+              onSearch={handleSearch}
+              className="max-w-md"
+            />
+            
+            {/* Category Filter */}
+            <div className="flex flex-wrap gap-3">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setActiveCategory(category)}
+                  className={`px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-300 ${
+                    activeCategory === category
+                      ? 'bg-foreground text-background'
+                      : 'bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground'
+                  }`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
           </motion.div>
         </div>
       </section>
@@ -139,46 +169,56 @@ const Blog = () => {
       {/* Posts Grid */}
       <section className="py-12 md:py-16">
         <div className="container-wide">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredPosts.map((post, index) => (
-              <motion.article
-                key={post.id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <Link to={`/blog/${post.id}`} className="group block">
-                  <div className="relative overflow-hidden rounded-xl aspect-[16/10] mb-5">
-                    <img
-                      src={post.image}
-                      alt={post.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                  </div>
-                  <span className="text-accent text-xs uppercase tracking-widest mb-2 block">
-                    {post.category}
-                  </span>
-                  <h3 className="text-xl font-syne font-bold mb-3 group-hover:text-accent transition-colors line-clamp-2">
-                    {post.title}
-                  </h3>
-                  <p className="text-foreground/60 text-sm mb-4 line-clamp-2">
-                    {post.excerpt}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
+          {filteredPosts.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredPosts.map((post, index) => (
+                <motion.article
+                  key={post.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <Link to={`/blog/${post.id}`} className="group block">
+                    <div className="relative overflow-hidden rounded-xl aspect-[16/10] mb-5">
                       <img
-                        src={post.author.image}
-                        alt={post.author.name}
-                        className="w-8 h-8 rounded-full object-cover"
+                        src={post.image}
+                        alt={post.title}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
-                      <span className="text-sm text-foreground/70">{post.author.name}</span>
                     </div>
-                    <span className="text-xs text-foreground/50">{post.readTime}</span>
-                  </div>
-                </Link>
-              </motion.article>
-            ))}
-          </div>
+                    <span className="text-accent text-xs uppercase tracking-widest mb-2 block">
+                      {post.category}
+                    </span>
+                    <h3 className="text-xl font-syne font-bold mb-3 group-hover:text-accent transition-colors line-clamp-2">
+                      {post.title}
+                    </h3>
+                    <p className="text-foreground/60 text-sm mb-4 line-clamp-2">
+                      {post.excerpt}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={post.author.image}
+                          alt={post.author.name}
+                          className="w-8 h-8 rounded-full object-cover"
+                        />
+                        <span className="text-sm text-foreground/70">{post.author.name}</span>
+                      </div>
+                      <span className="text-xs text-foreground/50">{post.readTime}</span>
+                    </div>
+                  </Link>
+                </motion.article>
+              ))}
+            </div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-20"
+            >
+              <p className="text-foreground/50 text-lg">No articles found matching your search.</p>
+            </motion.div>
+          )}
         </div>
       </section>
 
@@ -199,20 +239,7 @@ const Blog = () => {
               Get the latest insights on design, branding, and digital trends 
               delivered straight to your inbox.
             </p>
-            <form className="flex flex-col sm:flex-row gap-4">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-6 py-4 bg-background border border-foreground/10 rounded-full focus:outline-none focus:border-foreground/30 transition-colors"
-              />
-              <button
-                type="submit"
-                className="px-8 py-4 bg-foreground text-background font-medium rounded-full hover:bg-accent transition-colors flex items-center justify-center gap-2"
-              >
-                Subscribe
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </form>
+            <NewsletterForm variant="inline" />
           </motion.div>
         </div>
       </section>
