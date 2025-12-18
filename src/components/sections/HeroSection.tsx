@@ -45,19 +45,19 @@ export const HeroSection = () => {
         className="absolute -bottom-1/4 -right-1/4 w-[1000px] h-[1000px] rounded-full border border-foreground/10"
       />
 
-      <motion.div style={{ y }} className="container-wide relative z-10 text-center">
+      <motion.div style={{ y }} className="container-wide relative z-10 text-center px-4">
         {/* Label */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5, ease: [0.19, 1, 0.22, 1] }}
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
           <span className="label text-muted-foreground">Award-Winning Digital Agency</span>
         </motion.div>
 
         {/* Main Headline */}
-        <h1 className="heading-display mb-8">
+        <h1 className="heading-display mb-6 sm:mb-8">
           <motion.span
             initial={{ opacity: 0, y: 100 }}
             animate={{ opacity: 1, y: 0 }}
@@ -89,7 +89,7 @@ export const HeroSection = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.4, ease: [0.19, 1, 0.22, 1] }}
-          className="body-lg text-muted-foreground max-w-xl mx-auto mb-12"
+          className="body-lg text-muted-foreground max-w-md sm:max-w-lg md:max-w-xl mx-auto mb-8 sm:mb-10 md:mb-12"
         >
           A creative studio crafting immersive digital products, brands, 
           and experiences that captivate and inspire.

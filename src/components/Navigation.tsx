@@ -31,11 +31,13 @@ export const Navigation = () => {
         animate={{ y: 0 }}
         transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          isScrolled ? 'py-4' : 'py-6 md:py-8'
+          isScrolled 
+            ? 'py-3 sm:py-4 bg-background/90 backdrop-blur-lg border-b border-border/50 shadow-sm' 
+            : 'py-4 sm:py-6 md:py-8'
         }`}
       >
         <div className="container-wide flex items-center justify-between">
-          <Link to="/" className="font-syne text-xl md:text-2xl font-bold tracking-tight">
+          <Link to="/" className="font-syne text-lg sm:text-xl md:text-2xl font-bold tracking-tight">
             STUDIO<span className="text-accent">.</span>
           </Link>
 
