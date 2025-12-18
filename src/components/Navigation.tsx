@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import MagneticButton from './MagneticButton';
 
 const navLinks = [
-  { name: 'Work', href: '#work' },
-  { name: 'About', href: '#about' },
-  { name: 'Services', href: '#services' },
-  { name: 'Contact', href: '#contact' },
+  { name: 'Work', href: '/work', isRoute: true },
+  { name: 'About', href: '#about', isRoute: false },
+  { name: 'Services', href: '#services', isRoute: false },
+  { name: 'Contact', href: '#contact', isRoute: false },
 ];
 
 export const Navigation = () => {
@@ -39,13 +40,23 @@ export const Navigation = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-12">
             {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="link-hover text-sm tracking-wide text-foreground/80 hover:text-foreground transition-colors"
-              >
-                {link.name}
-              </a>
+              link.isRoute ? (
+                <Link
+                  key={link.name}
+                  to={link.href}
+                  className="link-hover text-sm tracking-wide text-foreground/80 hover:text-foreground transition-colors"
+                >
+                  {link.name}
+                </Link>
+              ) : (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  className="link-hover text-sm tracking-wide text-foreground/80 hover:text-foreground transition-colors"
+                >
+                  {link.name}
+                </a>
+              )
             ))}
             <MagneticButton className="px-6 py-3 bg-foreground text-background text-sm font-medium hover:bg-accent transition-colors duration-300">
               Let's Talk
@@ -85,18 +96,36 @@ export const Navigation = () => {
           >
             <div className="flex flex-col items-center gap-8">
               {navLinks.map((link, i) => (
-                <motion.a
-                  key={link.name}
-                  href={link.href}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 30 }}
-                  transition={{ delay: i * 0.1, duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="heading-md text-foreground"
-                >
-                  {link.name}
-                </motion.a>
+                link.isRoute ? (
+                  <motion.div
+                    key={link.name}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 30 }}
+                    transition={{ delay: i * 0.1, duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
+                  >
+                    <Link
+                      to={link.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="heading-md text-foreground"
+                    >
+                      {link.name}
+                    </Link>
+                  </motion.div>
+                ) : (
+                  <motion.a
+                    key={link.name}
+                    href={link.href}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 30 }}
+                    transition={{ delay: i * 0.1, duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="heading-md text-foreground"
+                  >
+                    {link.name}
+                  </motion.a>
+                )
               ))}
             </div>
           </motion.div>
