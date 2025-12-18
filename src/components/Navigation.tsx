@@ -7,7 +7,7 @@ const navLinks = [
   { name: 'Work', href: '/work', isRoute: true },
   { name: 'About', href: '#about', isRoute: false },
   { name: 'Services', href: '#services', isRoute: false },
-  { name: 'Contact', href: '#contact', isRoute: false },
+  { name: 'Contact', href: '/contact', isRoute: true },
 ];
 
 export const Navigation = () => {
