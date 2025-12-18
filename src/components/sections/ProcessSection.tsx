@@ -38,7 +38,7 @@ export const ProcessSection = () => {
     <section ref={ref} className="section-padding">
       <div className="container-wide">
         {/* Header */}
-        <div className="max-w-3xl mb-16 md:mb-24">
+        <div className="max-w-3xl mb-12 md:mb-20">
           <AnimatedLine delay={0.2}>
             <span className="label text-accent mb-6 block">Our Process</span>
           </AnimatedLine>
@@ -78,7 +78,7 @@ export const ProcessSection = () => {
                     index % 2 === 0 ? 'md:pr-12' : 'md:order-2 md:pl-12'
                   } pb-12 md:pb-24`}
                 >
-                  <span className="heading-display text-secondary/80 mb-4 block">
+                  <span className="text-5xl sm:text-6xl md:text-7xl font-syne font-bold text-muted/50 mb-3 block">
                     {step.number}
                   </span>
                   <h3 className="heading-md mb-4">{step.title}</h3>

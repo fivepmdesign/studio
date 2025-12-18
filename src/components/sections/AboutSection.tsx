@@ -9,7 +9,7 @@ export const AboutSection = () => {
   return (
     <section id="about" ref={ref} className="section-padding bg-secondary/30">
       <div className="container-wide">
-        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* Text Content */}
           <div className="order-2 lg:order-1">
             <AnimatedLine delay={0.2}>
@@ -45,7 +45,7 @@ export const AboutSection = () => {
               initial={{ opacity: 0, y: 40 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8, delay: 0.9, ease: [0.19, 1, 0.22, 1] }}
-              className="grid grid-cols-3 gap-8 mt-12 pt-12 border-t border-border"
+              className="grid grid-cols-3 gap-4 sm:gap-6 md:gap-8 mt-10 pt-10 border-t border-border"
             >
               {[
                 { number: '150+', label: 'Projects' },
