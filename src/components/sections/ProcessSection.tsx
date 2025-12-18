@@ -1,56 +1,162 @@
-import { motion, useInView, useMotionValue, useSpring, AnimatePresence } from 'framer-motion';
+import { motion, useInView, useMotionValue, useSpring } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
 import { AnimatedLine } from '@/components/AnimatedText';
-import { Compass, Target, Palette, Code, Rocket } from 'lucide-react';
+import { Compass, Target, Palette, Code, Rocket, ArrowRight } from 'lucide-react';
 
 const steps = [
   {
     number: '01',
     title: 'Discovery',
     description: 'We begin by understanding your vision, goals, and audience. Deep research and strategic analysis form the foundation of every project.',
-    details: ['User Research', 'Competitive Analysis', 'Goal Definition', 'Technical Assessment'],
     icon: Compass,
-    color: 'primary',
   },
   {
     number: '02',
     title: 'Strategy',
     description: 'Insights transform into actionable plans. We define the approach, set milestones, and align on success metrics.',
-    details: ['Roadmap Planning', 'KPI Definition', 'Resource Allocation', 'Timeline Setup'],
     icon: Target,
-    color: 'accent',
   },
   {
     number: '03',
     title: 'Design',
     description: 'Ideas take visual form. Our design process is iterative, collaborative, and focused on creating meaningful experiences.',
-    details: ['Wireframing', 'Visual Design', 'Prototyping', 'User Testing'],
     icon: Palette,
-    color: 'primary',
   },
   {
     number: '04',
     title: 'Development',
     description: 'Designs become reality. We build with precision, performance, and scalability as core principles.',
-    details: ['Frontend Build', 'Backend Integration', 'Quality Assurance', 'Performance Optimization'],
     icon: Code,
-    color: 'accent',
   },
   {
     number: '05',
     title: 'Launch',
     description: 'The culmination of our work. We ensure a seamless launch and provide ongoing support for continued success.',
-    details: ['Deployment', 'Monitoring Setup', 'Documentation', 'Ongoing Support'],
     icon: Rocket,
-    color: 'primary',
   },
 ];
+
+interface StepCardProps {
+  step: typeof steps[0];
+  index: number;
+  activeIndex: number | null;
+  setActiveIndex: (index: number | null) => void;
+  isLast: boolean;
+}
+
+const StepCard = ({ step, index, activeIndex, setActiveIndex, isLast }: StepCardProps) => {
+  const Icon = step.icon;
+  const isActive = activeIndex === index;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-50px' }}
+      transition={{ duration: 0.6, delay: index * 0.1 }}
+      onMouseEnter={() => setActiveIndex(index)}
+      onMouseLeave={() => setActiveIndex(null)}
+      className="group relative"
+    >
+      {/* Connecting Line to next card */}
+      {!isLast && (
+        <div className="hidden lg:block absolute top-8 -right-4 w-8 z-10">
+          <motion.div 
+            className="h-[2px] bg-border"
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
+          />
+          <motion.div
+            className={`absolute right-0 top-1/2 -translate-y-1/2 transition-colors duration-300 ${
+              isActive ? 'text-accent' : 'text-border'
+            }`}
+            animate={{ x: isActive ? 4 : 0 }}
+          >
+            <ArrowRight className="w-4 h-4" />
+          </motion.div>
+        </div>
+      )}
+
+      <div className={`relative h-full p-8 md:p-10 border transition-all duration-500 ${
+        isActive 
+          ? 'bg-accent/5 border-accent/30' 
+          : 'bg-card/30 border-border/50 hover:border-border'
+      }`}>
+        {/* Step Number - Top Right */}
+        <motion.span 
+          className={`absolute top-4 right-4 text-xs font-mono transition-colors duration-300 ${
+            isActive ? 'text-accent' : 'text-muted-foreground/40'
+          }`}
+        >
+          {step.number}
+        </motion.span>
+
+        {/* Icon with Circle */}
+        <motion.div
+          className={`relative w-16 h-16 flex items-center justify-center mb-6 border-2 transition-all duration-500 ${
+            isActive 
+              ? 'border-accent bg-accent/10' 
+              : 'border-border bg-transparent'
+          }`}
+          animate={{ 
+            rotate: isActive ? 45 : 0,
+            scale: isActive ? 1.05 : 1 
+          }}
+          transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
+        >
+          <motion.div
+            animate={{ rotate: isActive ? -45 : 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Icon className={`w-7 h-7 transition-colors duration-300 ${
+              isActive ? 'text-accent' : 'text-foreground/70'
+            }`} strokeWidth={1.5} />
+          </motion.div>
+        </motion.div>
+
+        {/* Content */}
+        <motion.h3 
+          className="font-syne font-bold text-xl md:text-2xl mb-3 transition-colors duration-300 group-hover:text-accent"
+          animate={{ x: isActive ? 5 : 0 }}
+        >
+          {step.title}
+        </motion.h3>
+        <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
+          {step.description}
+        </p>
+
+        {/* Bottom accent line */}
+        <motion.div
+          className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent origin-left"
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: isActive ? 1 : 0 }}
+          transition={{ duration: 0.4, ease: [0.19, 1, 0.22, 1] }}
+        />
+
+        {/* Corner accent */}
+        <motion.div
+          className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-accent"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: isActive ? 1 : 0, scale: isActive ? 1 : 0.8 }}
+          transition={{ duration: 0.3 }}
+        />
+        <motion.div
+          className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-accent"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: isActive ? 1 : 0, scale: isActive ? 1 : 0.8 }}
+          transition={{ duration: 0.3 }}
+        />
+      </div>
+    </motion.div>
+  );
+};
 
 export const ProcessSection = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
-  const [activeStep, setActiveStep] = useState(0);
-  const [hoveredStep, setHoveredStep] = useState<number | null>(null);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -71,302 +177,110 @@ export const ProcessSection = () => {
 
   return (
     <section ref={ref} className="section-padding relative overflow-hidden">
-      {/* Grid Pattern Overlay */}
-      <div className="absolute inset-0 opacity-[0.02]" 
-        style={{
-          backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px),
-                           linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,
-          backgroundSize: '80px 80px'
-        }}
-      />
-
-      {/* Floating Geometric Shapes */}
-      <motion.div
-        className="absolute top-40 right-20 w-20 h-20 border border-primary/10 rotate-45"
-        style={{ x: smoothX, y: smoothY }}
-      />
-      <motion.div
-        className="absolute bottom-40 left-20 w-16 h-16 bg-accent/5 rounded-full"
-        style={{ x: smoothX, y: smoothY }}
-      />
-      <motion.div
-        className="absolute top-1/2 right-1/4 w-12 h-12 border border-accent/20"
-        style={{ x: smoothX, y: smoothY }}
-      />
-
-      {/* Corner Decorations */}
-      <div className="absolute top-8 left-8 w-16 h-16">
-        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-primary/50 to-transparent" />
-        <div className="absolute top-0 left-0 w-[1px] h-full bg-gradient-to-b from-primary/50 to-transparent" />
+      {/* Background grid */}
+      <div className="absolute inset-0 pointer-events-none">
+        {[...Array(5)].map((_, i) => (
+          <motion.div
+            key={`h-${i}`}
+            className="absolute left-0 right-0 h-px bg-foreground/5"
+            style={{ top: `${20 * (i + 1)}%` }}
+            initial={{ scaleX: 0 }}
+            animate={isInView ? { scaleX: 1 } : {}}
+            transition={{ delay: i * 0.05, duration: 1.2 }}
+          />
+        ))}
       </div>
-      <div className="absolute bottom-8 right-8 w-16 h-16">
-        <div className="absolute bottom-0 right-0 w-full h-[1px] bg-gradient-to-l from-primary/50 to-transparent" />
-        <div className="absolute bottom-0 right-0 w-[1px] h-full bg-gradient-to-t from-primary/50 to-transparent" />
-      </div>
+
+      {/* Floating shapes */}
+      <motion.div
+        className="absolute top-32 right-20 w-24 h-24 border border-accent/10"
+        style={{ x: smoothX, y: smoothY, rotate: 45 }}
+      />
+      <motion.div
+        className="absolute bottom-40 left-16 w-16 h-16 bg-primary/5 rounded-full"
+        style={{ x: smoothX, y: smoothY }}
+      />
+      <motion.div
+        className="absolute top-1/2 left-1/3 w-8 h-8 border border-primary/20"
+        style={{ x: smoothX, y: smoothY }}
+      />
 
       <div className="container-wide relative z-10">
         {/* Header */}
-        <div className="max-w-4xl mb-20">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8 }}
-            className="flex items-center gap-4 mb-8"
-          >
-            <span className="text-sm font-mono text-primary">04</span>
-            <div className="h-px w-12 bg-primary/30" />
-            <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Our Process</span>
-          </motion.div>
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-16 md:mb-24">
+          <div className="max-w-2xl">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              animate={isInView ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.8 }}
+              className="flex items-center gap-4 mb-8"
+            >
+              <span className="text-sm font-mono text-accent">04</span>
+              <div className="h-px w-12 bg-accent" />
+              <span className="text-sm font-mono text-muted-foreground tracking-wider">OUR PROCESS</span>
+            </motion.div>
 
-          <AnimatedLine delay={0.3}>
-            <h2 className="font-syne font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tight leading-[1.1] mb-6">
-              A structured approach to{' '}
-              <span className="text-primary">exceptional</span> outcomes.
-            </h2>
-          </AnimatedLine>
+            <AnimatedLine delay={0.3}>
+              <h2 className="font-syne font-bold text-4xl sm:text-5xl md:text-6xl tracking-tight leading-[1.1]">
+                A structured approach to exceptional outcomes.
+              </h2>
+            </AnimatedLine>
+          </div>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: 0.5 }}
-            className="text-muted-foreground text-lg max-w-2xl"
+            className="text-muted-foreground max-w-md"
           >
             Every project follows our proven methodology, refined over years of delivering successful digital products.
           </motion.p>
         </div>
 
-        {/* Main Content - Split Layout */}
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20">
-          {/* Left: Timeline Navigation */}
-          <div className="relative">
-            {/* Vertical Timeline Line */}
-            <motion.div
-              initial={{ scaleY: 0 }}
-              animate={isInView ? { scaleY: 1 } : {}}
-              transition={{ duration: 1.5, delay: 0.5, ease: [0.19, 1, 0.22, 1] }}
-              className="absolute left-6 top-0 bottom-0 w-[1px] bg-border origin-top"
+        {/* Process Steps Grid - 5 columns on large, 2-3 on medium */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 lg:gap-4">
+          {steps.map((step, index) => (
+            <StepCard 
+              key={step.number} 
+              step={step} 
+              index={index}
+              activeIndex={activeIndex}
+              setActiveIndex={setActiveIndex}
+              isLast={index === steps.length - 1}
             />
+          ))}
+        </div>
 
-            {/* Progress Line */}
-            <motion.div
-              className="absolute left-6 top-0 w-[1px] bg-primary origin-top"
-              style={{ height: `${((activeStep + 1) / steps.length) * 100}%` }}
-              transition={{ duration: 0.5 }}
-            />
-
-            <div className="space-y-2">
-              {steps.map((step, index) => {
-                const Icon = step.icon;
-                const isActive = activeStep === index;
-                const isHovered = hoveredStep === index;
-
-                return (
-                  <motion.div
-                    key={step.number}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    onClick={() => setActiveStep(index)}
-                    onMouseEnter={() => setHoveredStep(index)}
-                    onMouseLeave={() => setHoveredStep(null)}
-                    className="relative cursor-pointer group"
-                  >
-                    {/* Step Node */}
-                    <div className="flex items-start gap-6">
-                      {/* Circle Node */}
-                      <motion.div 
-                        className={`relative z-10 w-12 h-12 flex items-center justify-center border-2 transition-all duration-300 ${
-                          isActive 
-                            ? 'bg-primary border-primary' 
-                            : isHovered
-                              ? 'bg-primary/10 border-primary/50'
-                              : 'bg-background border-border'
-                        }`}
-                        animate={{ 
-                          scale: isActive ? 1.1 : isHovered ? 1.05 : 1,
-                          rotate: isActive ? 45 : 0
-                        }}
-                      >
-                        <motion.span 
-                          className={`font-mono text-sm font-bold transition-colors ${
-                            isActive ? 'text-primary-foreground' : 'text-foreground'
-                          }`}
-                          animate={{ rotate: isActive ? -45 : 0 }}
-                        >
-                          {step.number}
-                        </motion.span>
-                      </motion.div>
-
-                      {/* Content */}
-                      <div className={`flex-1 py-3 px-5 border transition-all duration-300 ${
-                        isActive 
-                          ? 'bg-primary/5 border-primary/30' 
-                          : isHovered
-                            ? 'bg-card/50 border-border'
-                            : 'bg-transparent border-transparent'
-                      }`}>
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className={`font-syne font-bold text-xl transition-colors duration-300 ${
-                            isActive ? 'text-primary' : 'text-foreground'
-                          }`}>
-                            {step.title}
-                          </h3>
-                          <Icon className={`w-5 h-5 transition-all duration-300 ${
-                            isActive ? 'text-primary' : 'text-muted-foreground'
-                          }`} />
-                        </div>
-                        
-                        <p className={`text-sm transition-all duration-300 ${
-                          isActive || isHovered ? 'text-muted-foreground' : 'text-muted-foreground/50'
-                        }`}>
-                          {step.description}
-                        </p>
-
-                        {/* Corner accents on active */}
-                        {isActive && (
-                          <>
-                            <div className="absolute top-0 left-12 w-3 h-3 border-l-2 border-t-2 border-primary" />
-                            <div className="absolute bottom-0 right-0 w-3 h-3 border-r-2 border-b-2 border-primary" />
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
+        {/* Bottom Timeline Progress */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.8 }}
+          className="mt-16 pt-8 border-t border-border"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-3 h-3 bg-accent" />
+              <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
+                From concept to launch
+              </span>
+            </div>
+            <div className="hidden md:flex items-center gap-2">
+              {steps.map((step, index) => (
+                <motion.div
+                  key={step.number}
+                  className={`w-12 h-1 transition-colors duration-300 ${
+                    activeIndex !== null && index <= activeIndex 
+                      ? 'bg-accent' 
+                      : 'bg-border'
+                  }`}
+                  whileHover={{ scaleY: 2 }}
+                />
+              ))}
             </div>
           </div>
-
-          {/* Right: Active Step Detail */}
-          <div className="relative lg:sticky lg:top-32 h-fit">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeStep}
-                initial={{ opacity: 0, y: 20, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -20, scale: 0.98 }}
-                transition={{ duration: 0.4 }}
-                className="relative"
-              >
-                {/* Large Background Number */}
-                <motion.div
-                  className="absolute -top-8 -right-4 text-[200px] font-syne font-bold text-primary/5 leading-none select-none pointer-events-none"
-                  initial={{ opacity: 0, x: 50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  {steps[activeStep].number}
-                </motion.div>
-
-                {/* Detail Card */}
-                <div className="relative border border-border bg-card/50 backdrop-blur-sm p-8 lg:p-12">
-                  {/* Grid overlay */}
-                  <div className="absolute inset-0 opacity-[0.03]" 
-                    style={{
-                      backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px),
-                                       linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,
-                      backgroundSize: '40px 40px'
-                    }}
-                  />
-
-                  {/* Corner decorations */}
-                  <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-primary" />
-                  <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-primary" />
-                  <div className="absolute bottom-0 left-0 w-6 h-6 border-l-2 border-b-2 border-primary" />
-                  <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-primary" />
-
-                  <div className="relative z-10">
-                    {/* Icon */}
-                    <motion.div
-                      initial={{ scale: 0, rotate: -180 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ type: "spring", stiffness: 200, delay: 0.1 }}
-                      className="w-16 h-16 border-2 border-primary flex items-center justify-center mb-8"
-                    >
-                      {(() => {
-                        const Icon = steps[activeStep].icon;
-                        return <Icon className="w-8 h-8 text-primary" />;
-                      })()}
-                    </motion.div>
-
-                    {/* Title */}
-                    <div className="flex items-center gap-4 mb-4">
-                      <span className="text-xs font-mono text-primary">STEP {steps[activeStep].number}</span>
-                      <div className="h-[1px] flex-1 bg-primary/20" />
-                    </div>
-
-                    <h3 className="font-syne font-bold text-3xl lg:text-4xl mb-4">
-                      {steps[activeStep].title}
-                    </h3>
-
-                    <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
-                      {steps[activeStep].description}
-                    </p>
-
-                    {/* Details List */}
-                    <div className="space-y-3">
-                      <p className="text-xs font-mono text-primary uppercase tracking-wider mb-4">Key Activities</p>
-                      {steps[activeStep].details.map((detail, index) => (
-                        <motion.div
-                          key={detail}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.3 + index * 0.1 }}
-                          className="flex items-center gap-4 group"
-                        >
-                          <div className="w-8 h-[1px] bg-primary/30 group-hover:bg-primary group-hover:w-12 transition-all duration-300" />
-                          <span className="text-foreground/80 group-hover:text-primary transition-colors">
-                            {detail}
-                          </span>
-                        </motion.div>
-                      ))}
-                    </div>
-
-                    {/* Progress Indicator */}
-                    <div className="mt-10 pt-8 border-t border-border">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-mono text-muted-foreground">PROGRESS</span>
-                        <span className="text-xs font-mono text-primary">
-                          {activeStep + 1} / {steps.length}
-                        </span>
-                      </div>
-                      <div className="h-1 bg-border overflow-hidden">
-                        <motion.div
-                          className="h-full bg-primary"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${((activeStep + 1) / steps.length) * 100}%` }}
-                          transition={{ duration: 0.5 }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Navigation Dots */}
-                <div className="flex items-center justify-center gap-3 mt-8">
-                  {steps.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setActiveStep(index)}
-                      className={`relative w-3 h-3 transition-all duration-300 ${
-                        activeStep === index ? 'bg-primary' : 'bg-border hover:bg-primary/50'
-                      }`}
-                    >
-                      {activeStep === index && (
-                        <motion.div
-                          layoutId="activeDot"
-                          className="absolute inset-0 border-2 border-primary"
-                          style={{ margin: -4 }}
-                        />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
