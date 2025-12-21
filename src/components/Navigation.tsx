@@ -308,7 +308,7 @@ export const Navigation = () => {
                   <motion.span
                     className="absolute top-1 left-0 right-0 h-0.5 bg-foreground rounded-full origin-center"
                     animate={isMobileMenuOpen 
-                      ? { rotate: 45, y: 4, width: '100%' } 
+                      ? { rotate: 45, y: 5, width: '100%' } 
                       : { rotate: 0, y: 0, width: '100%' }
                     }
                   />
@@ -322,7 +322,7 @@ export const Navigation = () => {
                   <motion.span
                     className="absolute bottom-1 left-0 right-0 h-0.5 bg-foreground rounded-full origin-center"
                     animate={isMobileMenuOpen 
-                      ? { rotate: -45, y: -4, width: '100%' } 
+                      ? { rotate: -45, y: -5, width: '100%' } 
                       : { rotate: 0, y: 0, width: '80%' }
                     }
                   />
