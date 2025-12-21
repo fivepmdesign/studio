@@ -17,10 +17,10 @@ const footerLinks = {
     { name: 'Development', href: '/services#development' },
   ],
   social: [
-    { name: 'Instagram', href: 'https://instagram.com' },
-    { name: 'Twitter', href: 'https://twitter.com' },
-    { name: 'LinkedIn', href: 'https://linkedin.com' },
-    { name: 'Dribbble', href: 'https://dribbble.com' },
+    { name: 'Instagram', href: '#' },
+    { name: 'Twitter', href: '#' },
+    { name: 'LinkedIn', href: '#' },
+    { name: 'Dribbble', href: '#' },
   ],
   legal: [
     { name: 'Privacy Policy', href: '/privacy-policy' },
@@ -106,9 +106,8 @@ export const Footer = () => {
                      <a 
                         key={link.name}
                         href={link.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm hover:text-accent transition-colors flex items-center gap-1"
+                        onClick={(e) => e.preventDefault()}
+                        className="text-sm hover:text-accent transition-colors flex items-center gap-1 cursor-pointer"
                      >
                         {link.name} <ArrowUpRight className="w-3 h-3" />
                      </a>
