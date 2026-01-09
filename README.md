@@ -35,7 +35,7 @@ A modern, premium digital agency template built with React, TypeScript, Tailwind
 git clone <repository-url>
 
 # Navigate to project directory
-cd lumina-creative-hub
+cd studio
 
 # Install dependencies
 npm install
@@ -74,3 +74,4 @@ src/
 ## License
 
 See LICENSE.md for license details.
+# studio
