@@ -91,7 +91,7 @@ const NewsletterForm = ({ variant = 'inline', className = '' }: NewsletterFormPr
               <CheckCircle className="w-6 h-6 text-primary" />
             </motion.div>
             <div className="text-left">
-              <p className="text-foreground font-syne font-bold text-lg">You&apos;re subscribed!</p>
+              <p className="text-foreground font-sans font-bold text-lg">You&apos;re subscribed!</p>
               <p className="text-sm text-muted-foreground font-mono">Welcome to the creative circle</p>
             </div>
           </div>
@@ -159,7 +159,7 @@ const NewsletterForm = ({ variant = 'inline', className = '' }: NewsletterFormPr
             disabled={isSubmitting}
             whileHover={{ scale: 1.02, x: 5 }}
             whileTap={{ scale: 0.98 }}
-            className="group w-full relative px-8 py-4 bg-foreground text-background font-syne font-bold overflow-hidden disabled:opacity-70"
+            className="group w-full relative px-8 py-4 bg-foreground text-background font-sans font-bold overflow-hidden disabled:opacity-70"
           >
             {/* Button hover effect */}
             <div className="absolute inset-0 bg-primary translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-500" />

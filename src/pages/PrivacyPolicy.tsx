@@ -5,7 +5,7 @@ import Navigation from '@/components/Navigation';
 
 const PrivacyPolicy = () => {
   const breadcrumbItems = [
-    { label: 'Privacy Policy', href: '/privacy-policy' }
+    { label: 'Privacy Policy', href: '/privacy' }
   ];
 
   return (
@@ -14,7 +14,7 @@ const PrivacyPolicy = () => {
       <SEO 
         title="Privacy Policy"
         description="Read our privacy policy to understand how we collect, use, and protect your personal information."
-        url="https://studio.design/privacy-policy"
+        url="https://studio.design/privacy"
       />
       
       <main className="min-h-screen bg-background pt-32 pb-20">

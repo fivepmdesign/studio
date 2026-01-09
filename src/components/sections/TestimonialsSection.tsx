@@ -89,7 +89,7 @@ export const TestimonialsSection = () => {
             </motion.div>
 
             <AnimatedLine delay={0.3}>
-              <h2 className="font-syne font-bold text-4xl sm:text-5xl md:text-6xl tracking-tight leading-[1.1]">
+              <h2 className="font-sans font-bold text-4xl sm:text-5xl md:text-6xl tracking-tight leading-[1.1]">
                 Words from those we've worked with.
               </h2>
             </AnimatedLine>
@@ -140,17 +140,17 @@ export const TestimonialsSection = () => {
                   </div>
 
                   {/* Quote text */}
-                  <blockquote className="font-syne text-xl md:text-2xl lg:text-3xl font-medium leading-relaxed mb-8">
+                  <blockquote className="font-sans text-xl md:text-2xl lg:text-3xl font-medium leading-relaxed mb-8">
                     "{testimonial.quote}"
                   </blockquote>
 
                   {/* Author */}
                   <div className="flex items-center gap-4 pt-6 border-t border-border/50">
-                    <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center font-syne font-bold text-accent">
+                    <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center font-sans font-bold text-accent">
                       {testimonial.avatar}
                     </div>
                     <div>
-                      <span className="font-syne font-semibold block">{testimonial.author}</span>
+                      <span className="font-sans font-semibold block">{testimonial.author}</span>
                       <span className="text-sm text-muted-foreground">{testimonial.role}</span>
                     </div>
                   </div>
@@ -209,7 +209,7 @@ export const TestimonialsSection = () => {
               {[...clients, ...clients].map((client, index) => (
                 <span
                   key={index}
-                  className="text-xl font-syne font-bold text-muted-foreground/40 hover:text-foreground transition-colors duration-300 cursor-default"
+                  className="text-xl font-sans font-bold text-muted-foreground/40 hover:text-foreground transition-colors duration-300 cursor-default"
                 >
                   {client}
                 </span>

@@ -80,7 +80,7 @@ export const AboutSection = () => {
             </motion.div>
 
             <AnimatedLine delay={0.2}>
-              <h2 className="font-syne font-bold text-4xl sm:text-5xl md:text-6xl tracking-tight mb-8 leading-[1.1]">
+              <h2 className="font-sans font-bold text-4xl sm:text-5xl md:text-6xl tracking-tight mb-8 leading-[1.1]">
                 We are a team of creative minds & craftsmen.
               </h2>
             </AnimatedLine>
@@ -119,7 +119,7 @@ export const AboutSection = () => {
                   transition={{ delay: 0.7 + i * 0.1 }}
                 >
                   <div className="pl-4 border-l-2 border-accent/30 group-hover:border-accent transition-colors duration-300">
-                    <span className="font-syne font-bold text-3xl md:text-4xl text-foreground group-hover:text-accent transition-colors duration-300 block mb-1">
+                    <span className="font-sans font-bold text-3xl md:text-4xl text-foreground group-hover:text-accent transition-colors duration-300 block mb-1">
                       {stat.number}
                     </span>
                     <span className="block text-sm font-medium text-foreground mb-1">{stat.label}</span>
@@ -169,7 +169,7 @@ export const AboutSection = () => {
               className="absolute -left-6 bottom-12 bg-background border border-border px-6 py-4 shadow-xl"
             >
               <span className="text-xs font-mono text-muted-foreground">ESTABLISHED</span>
-              <span className="block font-syne font-bold text-3xl mt-1">2019</span>
+              <span className="block font-sans font-bold text-3xl mt-1">2019</span>
             </motion.div>
 
             {/* Side label */}

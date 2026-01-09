@@ -25,7 +25,7 @@ const BlogPost = () => {
         <Navigation />
         <div className="flex-1 flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
-            <h1 className="text-[60px] font-syne font-bold mb-4 leading-tight">Post not found</h1>
+            <h1 className="text-[60px] font-sans font-bold mb-4 leading-tight">Post not found</h1>
             <Link to="/blog" className="text-accent hover:underline flex items-center justify-center gap-2 link-hover">
               <ArrowLeft className="w-4 h-4" /> Back to blog
             </Link>
@@ -101,7 +101,7 @@ const BlogPost = () => {
                    initial={{ opacity: 0, y: 20 }}
                    animate={{ opacity: 1, y: 0 }}
                    transition={{ duration: 0.6 }}
-                   className="text-[40px] md:text-[50px] lg:text-[60px] font-syne font-bold leading-[1.05] tracking-tight text-foreground"
+                   className="text-[40px] md:text-[50px] lg:text-[60px] font-sans font-bold leading-[1.05] tracking-tight text-foreground"
                  >
                    {post.title}
                  </motion.h1>
@@ -139,7 +139,7 @@ const BlogPost = () => {
                        className="w-10 h-10 rounded-full object-cover" 
                     />
                     <div>
-                       <p className="font-syne font-bold leading-none mb-1">{post.author.name}</p>
+                       <p className="font-sans font-bold leading-none mb-1">{post.author.name}</p>
                        <p className="text-xs text-foreground/60">{post.author.role}</p>
                     </div>
                  </div>
@@ -207,21 +207,21 @@ const BlogPost = () => {
               </aside>
 
               {/* Right: Article Content */}
-              <article className="lg:col-span-8 lg:col-start-5 prose prose-lg prose-headings:font-syne prose-headings:font-bold prose-headings:text-[32px] prose-p:text-foreground/80 prose-p:leading-8 prose-img:rounded-sm">
+              <article className="lg:col-span-8 lg:col-start-5 prose prose-lg prose-headings:font-sans prose-headings:font-bold prose-headings:text-[32px] prose-p:text-foreground/80 prose-p:leading-8 prose-img:rounded-sm">
                  {post.content.map((paragraph, index) => (
                     <div key={index}>
                        <p>{paragraph}</p>
                        {index === 1 && (
                           <div className="my-12 p-8 bg-foreground/5 border-l-2 border-accent">
-                             <p className="font-syne font-bold text-2xl italic m-0 text-foreground">
+                             <p className="font-sans font-bold text-2xl italic m-0 text-foreground">
                                 "Good design is obvious. Great design is transparent."
                              </p>
                           </div>
                        )}
                        {index === 3 && (
                           <div className="my-12 grid grid-cols-2 gap-4 not-prose">
-                             <div className="aspect-square bg-foreground/5 rounded-sm flex items-center justify-center text-foreground/20 font-syne font-bold text-4xl">01</div>
-                             <div className="aspect-square bg-accent/10 rounded-sm flex items-center justify-center text-accent/20 font-syne font-bold text-4xl">02</div>
+                             <div className="aspect-square bg-foreground/5 rounded-sm flex items-center justify-center text-foreground/20 font-sans font-bold text-4xl">01</div>
+                             <div className="aspect-square bg-accent/10 rounded-sm flex items-center justify-center text-accent/20 font-sans font-bold text-4xl">02</div>
                           </div>
                        )}
                     </div>
@@ -234,7 +234,7 @@ const BlogPost = () => {
         {/* 4. Footer Navigation - Simple & Direct */}
         <section className="container-wide mt-32 border-t border-foreground/10 pt-16">
            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12">
-              <h3 className="font-syne font-bold text-3xl">Keep Reading</h3>
+              <h3 className="font-sans font-bold text-3xl">Keep Reading</h3>
               <Link to="/blog" className="mt-4 md:mt-0 text-sm font-mono uppercase tracking-widest border-b border-accent pb-1 hover:text-accent transition-colors">
                  View All Stories
               </Link>
@@ -253,7 +253,7 @@ const BlogPost = () => {
                     <div className="flex justify-between items-start">
                        <div className="max-w-md">
                           <span className="text-xs font-mono text-accent uppercase mb-2 block">{post.category}</span>
-                          <h4 className="font-syne font-bold text-2xl leading-tight group-hover:text-accent transition-colors mb-3">
+                          <h4 className="font-sans font-bold text-2xl leading-tight group-hover:text-accent transition-colors mb-3">
                              {post.title}
                           </h4>
                           <p className="text-sm text-foreground/60 line-clamp-2">

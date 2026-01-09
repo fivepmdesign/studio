@@ -76,7 +76,7 @@ const Preloader = ({ onComplete }: { onComplete: () => void }) => {
                  className="flex items-center gap-3"
               >
                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                 <span className="font-syne font-bold text-white tracking-tight text-xl">STUDIO.</span>
+                 <span className="font-sans font-bold text-white tracking-tight text-xl">STUDIO.</span>
               </motion.div>
            </div>
         </div>
@@ -103,10 +103,10 @@ const Preloader = ({ onComplete }: { onComplete: () => void }) => {
              animate={{ y: "0%" }}
              transition={{ duration: 0.8, ease: easeInOutExpo, delay: 0.3 }}
            >
-              <span className="text-[12vw] leading-none font-syne font-black text-white tracking-tighter">
+              <span className="text-[12vw] leading-none font-sans font-black text-white tracking-tighter">
                  {count}
               </span>
-              <span className="text-[12vw] leading-none font-syne font-black text-transparent tracking-tighter" style={{ WebkitTextStroke: "1px rgba(255,255,255,0.2)" }}>
+              <span className="text-[12vw] leading-none font-sans font-black text-transparent tracking-tighter" style={{ WebkitTextStroke: "1px rgba(255,255,255,0.2)" }}>
                  100
               </span>
            </motion.div>

@@ -58,7 +58,7 @@ const CookieConsent = () => {
                   We use cookies to enhance your browsing experience and analyze site traffic. 
                   By clicking "Accept", you consent to our use of cookies.{' '}
                   <Link 
-                    to="/privacy-policy" 
+                    to="/privacy" 
                     className="text-primary hover:underline"
                   >
                     Learn more

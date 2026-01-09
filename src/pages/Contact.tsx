@@ -138,7 +138,7 @@ const Contact = () => {
                     initial={{ y: '100%' }}
                     animate={heroInView ? { y: 0 } : {}}
                     transition={{ duration: 1, delay: 0.2 + index * 0.1, ease: [0.19, 1, 0.22, 1] }}
-                    className={`font-syne font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[0.95] ${
+                    className={`font-sans font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[0.95] ${
                       index === 2 ? 'text-accent' : 'text-foreground'
                     }`}
                   >
@@ -196,7 +196,7 @@ const Contact = () => {
                       </div>
 
                       <div>
-                        <span className="text-xl md:text-2xl font-syne font-bold leading-tight group-hover:text-accent transition-colors break-words">
+                        <span className="text-xl md:text-2xl font-sans font-bold leading-tight group-hover:text-accent transition-colors break-words">
                           {item.value}
                         </span>
                         {item.href && (
@@ -225,7 +225,7 @@ const Contact = () => {
                       <motion.a
                         key={social}
                         href="#"
-                        className="px-8 py-4 border border-border text-sm font-bold font-syne hover:bg-foreground hover:text-background hover:border-foreground transition-all duration-300 min-w-[120px] text-center"
+                        className="px-8 py-4 border border-border text-sm font-bold font-sans hover:bg-foreground hover:text-background hover:border-foreground transition-all duration-300 min-w-[120px] text-center"
                         initial={{ opacity: 0, y: 10 }}
                         animate={formInView ? { opacity: 1, y: 0 } : {}}
                         transition={{ delay: 0.7 + index * 0.05 }}
@@ -264,7 +264,7 @@ const Contact = () => {
                     >
                       <CheckCircle className="w-10 h-10 text-accent" />
                     </motion.div>
-                    <h2 className="text-3xl font-syne font-bold mb-4">Thank you!</h2>
+                    <h2 className="text-3xl font-sans font-bold mb-4">Thank you!</h2>
                     <p className="text-muted-foreground mb-8 max-w-sm">
                       Your message has been sent successfully. We'll get back to you within 24-48 hours.
                     </p>

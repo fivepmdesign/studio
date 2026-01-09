@@ -97,7 +97,7 @@ const ServiceCard = ({ service, index, activeIndex, setActiveIndex }: ServiceCar
 
                 {/* Content */}
                 <motion.h3
-                  className="font-syne font-bold text-xl md:text-2xl mb-3 transition-colors duration-300"
+                  className="font-sans font-bold text-xl md:text-2xl mb-3 transition-colors duration-300"
                   animate={{ x: isActive ? 5 : 0 }}
                 >
                   {service.title}
@@ -192,7 +192,7 @@ const ServiceCard = ({ service, index, activeIndex, setActiveIndex }: ServiceCar
             </motion.div>
 
             <AnimatedLine delay={0.3}>
-              <h2 className="font-syne font-bold text-4xl sm:text-5xl md:text-6xl tracking-tight leading-[1.1]">
+              <h2 className="font-sans font-bold text-4xl sm:text-5xl md:text-6xl tracking-tight leading-[1.1]">
                 Crafting solutions that elevate brands.
               </h2>
             </AnimatedLine>

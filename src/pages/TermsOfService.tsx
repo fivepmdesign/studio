@@ -5,7 +5,7 @@ import Navigation from '@/components/Navigation';
 
 const TermsOfService = () => {
   const breadcrumbItems = [
-    { label: 'Terms of Service', href: '/terms-of-service' }
+    { label: 'Terms of Service', href: '/terms' }
   ];
 
   return (
@@ -14,7 +14,7 @@ const TermsOfService = () => {
       <SEO 
         title="Terms of Service"
         description="Read our terms of service to understand the rules and guidelines for using our services."
-        url="https://studio.design/terms-of-service"
+        url="https://studio.design/terms"
       />
       
       <main className="min-h-screen bg-background pt-32 pb-20">

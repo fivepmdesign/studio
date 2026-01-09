@@ -2,17 +2,18 @@ import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'fram
 import { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import MagneticButton from '@/components/MagneticButton';
-import heroBg from '@/assets/hero-bg.jpg';
+import heroVideo from '@/assets/v-try.m4v?url';
 
 const words = [
-  { text: 'We', number: '01' },
-  { text: 'Create', number: '02' },
-  { text: 'Digital', number: '03' },
-  { text: 'Products', number: '04', accent: true },
+  { text: 'Rethink', number: '01' },
+  { text: 'your', number: '02' },
+  { text: 'e-commerce', number: '03' },
+  { text: 'experience', number: '04', accent: true },
 ];
 
 export const HeroSection = () => {
   const ref = useRef(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [currentTime, setCurrentTime] = useState('');
   
@@ -56,6 +57,15 @@ export const HeroSection = () => {
     });
   };
 
+  const handleVideoEnd = () => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+      videoRef.current.play().catch(() => {
+        // Silently handle play errors (e.g., if video is already playing)
+      });
+    }
+  };
+
   return (
     <motion.section
       ref={ref}
@@ -63,13 +73,19 @@ export const HeroSection = () => {
       onMouseMove={handleMouseMove}
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
-      {/* Background */}
+      {/* Background Video */}
       <motion.div className="absolute inset-0" style={{ y: bgY }}>
-        <img 
-          src={heroBg} 
-          alt="" 
+        <video 
+          ref={videoRef}
+          autoPlay
+          loop
+          muted
+          playsInline
+          onEnded={handleVideoEnd}
           className="w-full h-full object-cover opacity-40 scale-110"
-        />
+        >
+          <source src={heroVideo} type="video/mp4" />
+        </video>
         <div className="absolute inset-x-0 top-0 bottom-0 bg-gradient-to-b from-background/60 via-background/40 to-background" />
       </motion.div>
 
@@ -233,7 +249,7 @@ export const HeroSection = () => {
                     </motion.span>
                     
                     <span 
-                      className={`font-syne font-black text-[11vw] sm:text-6xl md:text-7xl lg:text-8xl xl:text-[120px] tracking-tight leading-[1] ${
+                      className={`font-sans font-black text-[11vw] sm:text-6xl md:text-7xl lg:text-8xl xl:text-[120px] tracking-tight leading-[1] ${
                         word.accent ? 'text-accent' : 'text-foreground'
                       }`}
                     >
@@ -307,7 +323,7 @@ export const HeroSection = () => {
                   to="/contact" 
                   className="group relative inline-flex items-center justify-center gap-3 px-6 sm:px-8 py-3 sm:py-4 border border-foreground/20 text-foreground font-semibold rounded-full overflow-hidden hover:border-accent/50 transition-colors duration-300 text-sm sm:text-base w-full sm:w-auto"
                 >
-                  <span className="relative z-10">Start a Project</span>
+                  <span className="relative z-10">Get started</span>
                   <motion.span 
                     className="relative z-10 text-accent"
                     animate={{ x: [0, 5, 0] }}
@@ -341,7 +357,7 @@ export const HeroSection = () => {
                   transition={{ delay: 2.2 + i * 0.1, duration: 0.5 }}
                   className="group"
                 >
-                  <div className="text-2xl sm:text-3xl md:text-4xl font-syne font-bold text-foreground group-hover:text-accent transition-colors duration-300">
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-sans font-bold text-foreground group-hover:text-accent transition-colors duration-300">
                     {stat.number}
                   </div>
                   <div className="text-xs sm:text-sm text-muted-foreground mt-1">{stat.label}</div>

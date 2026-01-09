@@ -15,8 +15,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        syne: ['Syne', 'sans-serif'],
-        inter: ['Inter', 'sans-serif'],
+        sans: ['DM Sans', 'sans-serif'],
+        mono: ['DM Mono', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",

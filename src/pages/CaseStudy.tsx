@@ -34,7 +34,7 @@ const CaseStudy = () => {
         <Navigation />
         <div className="flex-1 flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
-            <h1 className="text-4xl font-syne font-bold mb-4">Project Not Found</h1>
+            <h1 className="text-4xl font-sans font-bold mb-4">Project Not Found</h1>
             <Link to="/" className="text-accent hover:underline flex items-center justify-center gap-2">
               <ArrowLeft className="w-4 h-4" /> Return Home
             </Link>
@@ -99,7 +99,7 @@ const CaseStudy = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6 }}
-                  className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-syne font-bold leading-[0.9] tracking-tight text-foreground uppercase"
+                  className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-sans font-bold leading-[0.9] tracking-tight text-foreground uppercase"
                 >
                   {project.title}
                 </motion.h1>
@@ -145,7 +145,7 @@ const CaseStudy = () => {
                      <div className="p-6 border-b border-foreground/10 relative group hover:bg-foreground/5 transition-colors">
                         <span className="absolute top-6 right-6 text-[10px] font-mono text-accent opacity-0 group-hover:opacity-100 transition-opacity">01</span>
                         <h4 className="text-[10px] font-mono uppercase tracking-widest text-foreground/40 mb-3">Client</h4>
-                        <p className="text-lg font-syne font-bold leading-tight group-hover:translate-x-1 transition-transform duration-300">
+                        <p className="text-lg font-sans font-bold leading-tight group-hover:translate-x-1 transition-transform duration-300">
                            {project.client}
                         </p>
                      </div>
@@ -176,16 +176,16 @@ const CaseStudy = () => {
                   whileInView={{ opacity: 1 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5 }}
-                  className="prose prose-lg md:prose-xl max-w-none prose-headings:font-syne prose-headings:font-bold prose-p:text-foreground/80 prose-p:leading-relaxed prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-img:rounded-none prose-img:border prose-img:border-foreground/10"
+                  className="prose prose-lg md:prose-xl max-w-none prose-headings:font-sans prose-headings:font-bold prose-p:text-foreground/80 prose-p:leading-relaxed prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-img:rounded-none prose-img:border prose-img:border-foreground/10"
                 >
                   {/* Challenge Section */}
-                  <h3 className="text-2xl md:text-3xl font-syne font-bold mb-6">The Challenge</h3>
+                  <h3 className="text-2xl md:text-3xl font-sans font-bold mb-6">The Challenge</h3>
                   <p className="mb-12 text-foreground/80 leading-relaxed">
                     {project.challenge}
                   </p>
 
                   {/* Solution Section */}
-                  <h3 className="text-2xl md:text-3xl font-syne font-bold mb-6">The Solution</h3>
+                  <h3 className="text-2xl md:text-3xl font-sans font-bold mb-6">The Solution</h3>
                   <p className="mb-12 text-foreground/80 leading-relaxed">
                     {project.solution}
                   </p>
@@ -196,7 +196,7 @@ const CaseStudy = () => {
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 not-prose">
                         {project.results.map((result, i) => (
                            <div key={i}>
-                              <span className="block text-4xl md:text-5xl font-syne font-bold mb-2">{result.split(' ')[0]}</span>
+                              <span className="block text-4xl md:text-5xl font-sans font-bold mb-2">{result.split(' ')[0]}</span>
                               <span className="text-xs font-mono uppercase tracking-widest text-foreground/60">{result.split(' ').slice(1).join(' ')}</span>
                            </div>
                         ))}
@@ -209,7 +209,7 @@ const CaseStudy = () => {
                   <div className="flex items-end justify-between mb-16">
                      <div>
                         <span className="text-xs font-mono uppercase tracking-widest text-foreground/40 block mb-2">Visual Archive</span>
-                        <h3 className="text-3xl font-syne font-bold">Design Artifacts</h3>
+                        <h3 className="text-3xl font-sans font-bold">Design Artifacts</h3>
                      </div>
                      <span className="hidden md:block text-xs font-mono uppercase tracking-widest text-foreground/40">
                         {project.gallery.length} Assets Processed
@@ -246,11 +246,11 @@ const CaseStudy = () => {
                         
                         <div className="relative z-10 flex flex-col md:flex-row gap-8 md:gap-12 md:items-start">
                            <div className="md:w-1/4 pb-6 md:pb-0">
-                              <span className="text-5xl md:text-6xl font-syne font-black block leading-none mb-2">The Shift.</span>
+                              <span className="text-5xl md:text-6xl font-sans font-black block leading-none mb-2">The Shift.</span>
                               <span className="text-xs font-mono uppercase tracking-widest font-bold opacity-70">Retrospective</span>
                            </div>
                            <div className="md:w-3/4 md:pl-4">
-                              <p className="text-xl md:text-2xl font-syne font-bold leading-snug mb-4">
+                              <p className="text-xl md:text-2xl font-sans font-bold leading-snug mb-4">
                                  "{project.keyTakeaways}"
                               </p>
                               <div className="flex items-center gap-4">
@@ -272,7 +272,7 @@ const CaseStudy = () => {
         <section className="border-t border-foreground/10 bg-foreground/5 py-20">
           <div className="container-wide max-w-[90rem] mx-auto px-4 sm:px-6">
             <div className="flex items-end justify-between mb-12">
-              <h2 className="text-3xl md:text-4xl font-syne font-bold uppercase">Next Project</h2>
+              <h2 className="text-3xl md:text-4xl font-sans font-bold uppercase">Next Project</h2>
               <Link to="/work" className="hidden md:flex items-center gap-2 text-sm font-bold uppercase tracking-widest hover:text-accent transition-colors">
                 View All Work <ArrowRight className="w-4 h-4" />
               </Link>
@@ -296,7 +296,7 @@ const CaseStudy = () => {
                           <span className="text-accent">{nextProject.category}</span>
                           <span>{nextProject.year}</span>
                         </div>
-                        <h3 className="text-3xl md:text-5xl font-syne font-bold leading-tight group-hover:text-accent transition-colors mb-6">
+                        <h3 className="text-3xl md:text-5xl font-sans font-bold leading-tight group-hover:text-accent transition-colors mb-6">
                           {nextProject.title}
                         </h3>
                         <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest">

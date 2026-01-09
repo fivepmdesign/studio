@@ -56,7 +56,7 @@ export const ProcessSection = () => {
           </motion.div>
           
           <AnimatedLine>
-            <h2 className="font-syne font-bold text-5xl md:text-7xl max-w-4xl tracking-tight leading-[0.9]">
+            <h2 className="font-sans font-bold text-5xl md:text-7xl max-w-4xl tracking-tight leading-[0.9]">
               From concept to <span className="text-accent">reality.</span>
             </h2>
           </AnimatedLine>
@@ -85,7 +85,7 @@ export const ProcessSection = () => {
                   <div className="grid grid-cols-1 md:grid-cols-12 min-h-[400px]">
                     {/* Number Column */}
                     <div className="md:col-span-2 p-8 border-b md:border-b-0 md:border-r border-border bg-secondary/10 flex md:flex-col justify-between items-start">
-                       <span className="text-4xl font-syne font-bold text-foreground/20 group-hover:text-accent transition-colors duration-300">
+                       <span className="text-4xl font-sans font-bold text-foreground/20 group-hover:text-accent transition-colors duration-300">
                           {step.number}
                        </span>
                        <div className="hidden md:block w-px h-16 bg-foreground/10" />
@@ -96,7 +96,7 @@ export const ProcessSection = () => {
                        <div className="mb-6 w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center text-accent group-hover:scale-110 transition-transform duration-500">
                           <Icon size={32} strokeWidth={1.5} />
                        </div>
-                       <h3 className="text-3xl md:text-4xl font-syne font-bold mb-6 group-hover:translate-x-2 transition-transform duration-300">
+                       <h3 className="text-3xl md:text-4xl font-sans font-bold mb-6 group-hover:translate-x-2 transition-transform duration-300">
                           {step.title}
                        </h3>
                        <p className="text-lg text-muted-foreground leading-relaxed max-w-md">

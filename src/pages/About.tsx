@@ -185,7 +185,7 @@ const About = () => {
                     initial={{ y: '100%' }}
                     animate={heroInView ? { y: 0 } : {}}
                     transition={{ duration: 1, delay: 0.2 + index * 0.1, ease: [0.19, 1, 0.22, 1] }}
-                    className={`font-syne font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[0.95] ${
+                    className={`font-sans font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[0.95] ${
                       index === 2 ? 'text-accent' : 'text-foreground'
                     }`}
                   >
@@ -226,7 +226,7 @@ const About = () => {
                 initial={{ opacity: 0, y: 30 }}
                 animate={storyInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className="font-syne font-bold text-4xl md:text-5xl lg:text-6xl mb-8 leading-tight"
+                className="font-sans font-bold text-4xl md:text-5xl lg:text-6xl mb-8 leading-tight"
               >
                 Born from a belief that design can change everything.
               </motion.h2>
@@ -261,7 +261,7 @@ const About = () => {
                   className="group relative pt-8 border-t border-border hover:border-accent transition-colors duration-500"
                 >
                   <div className="flex flex-col gap-4">
-                    <span className="text-5xl md:text-6xl font-syne font-bold text-foreground/20 group-hover:text-accent transition-colors duration-500">
+                    <span className="text-5xl md:text-6xl font-sans font-bold text-foreground/20 group-hover:text-accent transition-colors duration-500">
                       {milestone.year}
                     </span>
                     <p className="text-foreground/80 font-medium leading-relaxed max-w-xs group-hover:text-foreground transition-colors duration-300">
@@ -291,7 +291,7 @@ const About = () => {
                 <div className="h-px w-12 bg-accent" />
                 <span className="text-sm font-mono text-muted-foreground tracking-wider">WHAT WE BELIEVE</span>
               </div>
-              <h2 className="text-3xl md:text-5xl font-syne font-bold">
+              <h2 className="text-3xl md:text-5xl font-sans font-bold">
                 Principles that guide us.
               </h2>
             </motion.div>
@@ -314,7 +314,7 @@ const About = () => {
                   </div>
 
                   <div className="relative z-10 mt-auto">
-                    <h3 className="text-2xl lg:text-4xl font-syne font-bold mb-4 whitespace-nowrap group-hover:text-accent transition-colors duration-300">
+                    <h3 className="text-2xl lg:text-4xl font-sans font-bold mb-4 whitespace-nowrap group-hover:text-accent transition-colors duration-300">
                       {value.title}
                     </h3>
                     <div className="lg:max-w-md lg:opacity-0 lg:group-hover:opacity-100 lg:translate-y-8 lg:group-hover:translate-y-0 transition-all duration-500 delay-100">
@@ -345,7 +345,7 @@ const About = () => {
                 <span className="text-sm font-mono text-muted-foreground tracking-wider">THE PEOPLE</span>
               </div>
               
-              <h2 className="text-4xl md:text-6xl font-syne font-bold max-w-3xl mx-auto leading-tight">
+              <h2 className="text-4xl md:text-6xl font-sans font-bold max-w-3xl mx-auto leading-tight">
                 Meet the dreamers & makers behind the screens.
               </h2>
             </motion.div>
@@ -381,7 +381,7 @@ const About = () => {
                         <span className="text-xs font-mono text-accent mb-2 block opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
                           {member.role}
                         </span>
-                        <h3 className="text-2xl font-syne font-bold text-white mb-2">
+                        <h3 className="text-2xl font-sans font-bold text-white mb-2">
                           {member.name}
                         </h3>
                         <p className="text-gray-300 text-sm line-clamp-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75">
@@ -431,10 +431,10 @@ const About = () => {
                 >
                   <div className="relative z-10 text-center">
                     <div className="flex items-start justify-center gap-1 leading-none">
-                      <span className="text-4xl md:text-6xl font-syne font-bold tracking-tighter">
+                      <span className="text-4xl md:text-6xl font-sans font-bold tracking-tighter">
                         {stat.number}
                       </span>
-                      <span className="text-2xl md:text-3xl font-syne font-medium text-accent group-hover:text-background transition-colors duration-500">
+                      <span className="text-2xl md:text-3xl font-sans font-medium text-accent group-hover:text-background transition-colors duration-500">
                         {stat.suffix}
                       </span>
                     </div>
@@ -467,7 +467,7 @@ const About = () => {
               transition={{ duration: 0.6 }}
             >
               <span className="text-sm font-mono text-accent mb-6 block">JOIN US</span>
-              <h2 className="text-3xl md:text-5xl lg:text-6xl font-syne font-bold mb-6">
+              <h2 className="text-3xl md:text-5xl lg:text-6xl font-sans font-bold mb-6">
                 Want to join our team?
               </h2>
               <p className="text-muted-foreground max-w-xl mx-auto mb-10">

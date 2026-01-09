@@ -2,11 +2,12 @@ import { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import MagneticButton from './MagneticButton';
+import appIcon from '@/assets/app-icon.svg';
 
 const navLinks = [
   { name: 'Work', href: '/work', number: '01' },
   { name: 'About', href: '/about', number: '02' },
-  { name: 'Services', href: '/services', number: '03' },
+  { name: 'Pricing', href: '/pricing', number: '03' },
   { name: 'Blog', href: '/blog', number: '04' },
   { name: 'Contact', href: '/contact', number: '05' },
 ];
@@ -86,38 +87,18 @@ export const Navigation = () => {
             isScrolled ? 'px-6 py-3' : 'py-6 md:py-8'
           }`}>
             
-            {/* Logo - Animated morphing design */}
+            {/* Logo */}
             <Link to="/" className="group relative">
               <motion.div
-                className="flex items-center gap-2"
+                className="flex items-center"
                 whileHover={{ scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
               >
-                {/* Animated logo mark */}
-                <motion.div 
-                  className="relative w-10 h-10 flex items-center justify-center"
-                  whileHover={{ rotate: 90 }}
-                  transition={{ duration: 0.4, ease: [0.19, 1, 0.22, 1] }}
-                >
-                  <motion.div 
-                    className="absolute inset-0 border-2 border-foreground rounded-lg"
-                    whileHover={{ borderRadius: "50%" }}
-                    transition={{ duration: 0.3 }}
-                  />
-                  <span className="font-syne font-black text-lg">S</span>
-                </motion.div>
-                
-                {/* Logo text - only on desktop */}
-                <div className="hidden sm:block overflow-hidden">
-                  <motion.span 
-                    className="font-syne text-lg font-bold tracking-tight block"
-                    initial={{ x: -20, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: 0.3, duration: 0.6 }}
-                  >
-                    STUDIO
-                  </motion.span>
-                </div>
+                <img 
+                  src={appIcon} 
+                  alt="V-TRY" 
+                  className="h-8 sm:h-10 w-auto"
+                />
               </motion.div>
               
               {/* Glow effect on hover */}
@@ -198,56 +179,13 @@ export const Navigation = () => {
               <div className={`w-px h-6 mx-4 transition-colors duration-500 ${isScrolled ? 'bg-border/50' : 'bg-transparent'}`} />
               
               <div className="flex items-center gap-2">
-                {/* CTA Button with unique design */}
-                <MagneticButton className="group relative ml-2">
-                  <Link 
-                    to="/contact" 
-                    className="relative flex items-center gap-3 px-5 py-2.5 bg-foreground text-background rounded-full overflow-hidden"
-                  >
-                    {/* Rotating border effect */}
-                    <motion.div
-                      className="absolute inset-0 rounded-full"
-                      style={{
-                        background: 'conic-gradient(from 0deg, transparent, hsl(var(--accent)), transparent)',
-                        padding: '2px',
-                      }}
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                    />
-                    
-                    <span className="relative z-10 text-sm font-semibold">Start a Project</span>
-                    
-                    {/* Animated arrow */}
-                    <motion.div
-                      className="relative z-10 w-5 h-5 rounded-full bg-background/20 flex items-center justify-center"
-                      whileHover={{ scale: 1.2 }}
-                    >
-                      <motion.svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 12 12"
-                        fill="none"
-                        className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                      >
-                        <path
-                          d="M2 10L10 2M10 2H4M10 2V8"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </motion.svg>
-                    </motion.div>
-                    
-                    {/* Hover background */}
-                    <motion.div
-                      className="absolute inset-0 bg-accent -z-0"
-                      initial={{ y: '100%' }}
-                      whileHover={{ y: 0 }}
-                      transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
-                    />
-                  </Link>
-                </MagneticButton>
+                {/* CTA Button */}
+                <Link 
+                  to="/contact" 
+                  className="px-5 py-2.5 bg-foreground text-background rounded-full text-sm font-semibold hover:bg-accent hover:text-accent-foreground transition-colors duration-300"
+                >
+                  Get started
+                </Link>
               </div>
             </div>
 
@@ -411,7 +349,7 @@ export const Navigation = () => {
                       </span>
                       
                       {/* Link text */}
-                      <span className={`text-4xl sm:text-5xl font-syne font-bold tracking-tight transition-all duration-300 ${
+                      <span className={`text-4xl sm:text-5xl font-sans font-bold tracking-tight transition-all duration-300 ${
                         isActiveLink(link.href) 
                           ? 'text-accent' 
                           : 'text-foreground/80 group-hover:text-foreground group-hover:translate-x-2'
@@ -451,10 +389,7 @@ export const Navigation = () => {
                 className="mt-12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6"
               >
                 <div className="text-sm text-muted-foreground">
-                  <p>Ready to start a project?</p>
-                  <a href="mailto:hello@studio.design" className="text-foreground hover:text-accent transition-colors">
-                    hello@studio.design
-                  </a>
+                  <p>Ready to sign up and discover the future of your e-commerce experience?</p>
                 </div>
                 
                 <Link
@@ -462,7 +397,7 @@ export const Navigation = () => {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="group inline-flex items-center gap-3 px-6 py-3 bg-accent text-accent-foreground font-semibold rounded-full"
                 >
-                  Start a Project
+                  Get started
                   <motion.div
                     className="w-6 h-6 rounded-full bg-accent-foreground/20 flex items-center justify-center"
                     whileHover={{ rotate: 45 }}

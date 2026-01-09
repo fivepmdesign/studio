@@ -67,7 +67,7 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0], index: n
 
           {/* Title & Arrow */}
           <div className="flex items-end justify-between gap-4 border-b border-border pb-6 group-hover:border-accent/50 transition-colors duration-500">
-            <h3 className="text-3xl md:text-4xl lg:text-5xl font-syne font-bold leading-tight group-hover:text-accent transition-colors duration-300">
+            <h3 className="text-3xl md:text-4xl lg:text-5xl font-sans font-bold leading-tight group-hover:text-accent transition-colors duration-300">
               {project.title}
             </h3>
             <ArrowUpRight className="w-8 h-8 text-muted-foreground group-hover:text-accent group-hover:-translate-y-2 group-hover:translate-x-2 transition-all duration-300 mb-1" />
@@ -190,7 +190,7 @@ const Projects = () => {
                   initial={{ y: '100%' }}
                   animate={heroInView ? { y: 0 } : {}}
                   transition={{ duration: 1, delay: 0.2 + index * 0.1, ease: [0.19, 1, 0.22, 1] }}
-                  className={`font-syne font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[0.95] ${
+                  className={`font-sans font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[0.95] ${
                     index === 1 ? 'text-accent' : 'text-foreground'
                   }`}
                 >
@@ -310,7 +310,7 @@ const Projects = () => {
             transition={{ duration: 0.6 }}
           >
             <span className="text-sm font-mono text-accent mb-6 block">START A PROJECT</span>
-            <h2 className="text-3xl md:text-5xl lg:text-6xl font-syne font-bold mb-6">
+            <h2 className="text-3xl md:text-5xl lg:text-6xl font-sans font-bold mb-6">
               Have an idea in mind?
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto mb-10">

@@ -132,7 +132,7 @@ export const CTASection = () => {
                     {word.number}
                   </motion.span>
                   <span 
-                    className={`font-syne font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[0.95] ${
+                    className={`font-sans font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[0.95] ${
                       word.accent ? 'text-accent' : 'text-foreground'
                     }`}
                   >
@@ -233,13 +233,13 @@ export const CTASection = () => {
                   {item.href ? (
                     <a 
                       href={item.href} 
-                      className="font-syne font-semibold text-lg hover:text-accent transition-colors duration-300 inline-flex items-center gap-2"
+                      className="font-sans font-semibold text-lg hover:text-accent transition-colors duration-300 inline-flex items-center gap-2"
                     >
                       {item.value}
                       <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </a>
                   ) : (
-                    <span className="font-syne font-semibold text-lg">{item.value}</span>
+                    <span className="font-sans font-semibold text-lg">{item.value}</span>
                   )}
                 </motion.div>
               ))}

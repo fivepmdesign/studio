@@ -53,7 +53,7 @@ const TrustBadges = ({ variant = 'horizontal', className = '' }: TrustBadgesProp
               <div className="w-12 h-12 border border-primary/30 flex items-center justify-center mb-4 group-hover:bg-primary/10 transition-colors">
                 <badge.icon className="w-5 h-5 text-primary" />
               </div>
-              <h4 className="font-syne font-bold text-foreground text-sm mb-1">
+              <h4 className="font-sans font-bold text-foreground text-sm mb-1">
                 {badge.title}
               </h4>
               <p className="text-xs text-muted-foreground font-mono">
@@ -86,7 +86,7 @@ const TrustBadges = ({ variant = 'horizontal', className = '' }: TrustBadgesProp
             <badge.icon className="w-4 h-4 text-primary" />
           </div>
           <div>
-            <p className="font-syne font-bold text-foreground text-sm">
+            <p className="font-sans font-bold text-foreground text-sm">
               {badge.title}
             </p>
             <p className="text-xs text-muted-foreground font-mono">

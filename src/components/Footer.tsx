@@ -1,20 +1,21 @@
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, ArrowRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import appIcon from '@/assets/app-icon.svg';
 
 const footerLinks = {
   navigation: [
     { name: 'Work', href: '/work' },
     { name: 'About', href: '/about' },
-    { name: 'Services', href: '/services' },
+    { name: 'Pricing', href: '/pricing' },
     { name: 'Blog', href: '/blog' },
     { name: 'Contact', href: '/contact' },
   ],
   services: [
-    { name: 'Web Design', href: '/services#web-design' },
-    { name: 'Branding', href: '/services#branding' },
-    { name: 'UI/UX Design', href: '/services#ui-ux' },
-    { name: 'Development', href: '/services#development' },
+    { name: 'Web Design', href: '/pricing#web-design' },
+    { name: 'Branding', href: '/pricing#branding' },
+    { name: 'UI/UX Design', href: '/pricing#ui-ux' },
+    { name: 'Development', href: '/pricing#development' },
   ],
   social: [
     { name: 'Instagram', href: '#' },
@@ -23,8 +24,8 @@ const footerLinks = {
     { name: 'Dribbble', href: '#' },
   ],
   legal: [
-    { name: 'Privacy Policy', href: '/privacy-policy' },
-    { name: 'Terms of Service', href: '/terms-of-service' },
+    { name: 'Privacy Policy', href: '/privacy' },
+    { name: 'Terms of Service', href: '/terms' },
   ],
 };
 
@@ -45,9 +46,11 @@ export const Footer = () => {
          <div className="lg:col-span-1 border-r border-border p-8 lg:p-12 flex flex-col justify-between min-h-[400px] lg:min-h-[600px]">
             <div>
                <Link to="/" className="inline-block mb-12">
-                 <span className="font-syne text-4xl font-bold tracking-tighter">
-                   STUDIO<span className="text-accent">.</span>
-                 </span>
+                 <img 
+                   src={appIcon} 
+                   alt="V-TRY" 
+                   className="h-12 w-auto"
+                 />
                </Link>
                <p className="text-muted-foreground font-mono text-sm leading-relaxed max-w-[200px]">
                   Crafting digital experiences that defy the ordinary.
@@ -59,7 +62,7 @@ export const Footer = () => {
                   <div className="w-2 h-2 bg-accent rounded-full animate-pulse"></div>
                   <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Local Time</span>
                </div>
-               <p className="font-syne text-3xl font-bold tabular-nums">
+               <p className="font-sans text-3xl font-bold tabular-nums">
                   {currentTime.toLocaleTimeString('en-US', { hour12: false })}
                </p>
             </div>
@@ -74,7 +77,7 @@ export const Footer = () => {
                   className="block p-8 border-b border-border hover:bg-accent hover:text-accent-foreground transition-all duration-300 group last:border-b-0"
                >
                   <div className="flex items-center justify-between">
-                     <span className="font-syne text-2xl font-bold group-hover:translate-x-2 transition-transform duration-300">
+                     <span className="font-sans text-2xl font-bold group-hover:translate-x-2 transition-transform duration-300">
                         {link.name}
                      </span>
                      <ArrowRight className="w-5 h-5 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
@@ -131,7 +134,7 @@ export const Footer = () => {
                <div className="w-20 h-20 rounded-full bg-background flex items-center justify-center mx-auto mb-6 group-hover:scale-125 transition-transform duration-500">
                   <ArrowUpRight className="w-8 h-8 text-foreground group-hover:text-accent transition-colors" />
                </div>
-               <h3 className="text-4xl lg:text-5xl font-syne font-black uppercase leading-none mb-4 group-hover:text-accent-foreground transition-colors">
+               <h3 className="text-4xl lg:text-5xl font-sans font-black uppercase leading-none mb-4 group-hover:text-accent-foreground transition-colors">
                   Start a<br/>Project
                </h3>
                <p className="font-mono text-sm text-muted-foreground group-hover:text-accent-foreground/80 transition-colors">
@@ -144,7 +147,7 @@ export const Footer = () => {
       {/* Bottom Legal Bar */}
       <div className="border-t border-border p-6 flex flex-col md:flex-row justify-between items-center gap-4 bg-background">
          <p className="text-xs font-mono text-muted-foreground uppercase">
-            © {new Date().getFullYear()} Studio Agency.
+            © 2026 V-TRY. All rights reserved.
          </p>
          <div className="flex gap-8">
             {footerLinks.legal.map((link) => (

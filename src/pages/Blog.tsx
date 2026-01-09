@@ -118,7 +118,7 @@ const Blog = () => {
                     initial={{ y: '100%' }}
                     animate={heroInView ? { y: 0 } : {}}
                     transition={{ duration: 1, delay: 0.2 + index * 0.1, ease: [0.19, 1, 0.22, 1] }}
-                    className={`font-syne font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[0.95] ${
+                    className={`font-sans font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[0.95] ${
                       index === 1 ? 'text-accent' : 'text-foreground'
                     }`}
                   >
@@ -186,7 +186,7 @@ const Blog = () => {
                             </span>
                          </div>
                          
-                         <h2 className="text-2xl md:text-4xl font-syne font-bold leading-tight mb-4 group-hover:text-accent transition-colors duration-300">
+                         <h2 className="text-2xl md:text-4xl font-sans font-bold leading-tight mb-4 group-hover:text-accent transition-colors duration-300">
                             {featuredPost.title}
                          </h2>
                          
@@ -306,7 +306,7 @@ const Blog = () => {
 
                       {/* Title & Excerpt */}
                       <div className="md:col-span-6 space-y-4">
-                        <h3 className="text-3xl md:text-5xl font-syne font-bold leading-tight group-hover:text-accent transition-colors duration-300">
+                        <h3 className="text-3xl md:text-5xl font-sans font-bold leading-tight group-hover:text-accent transition-colors duration-300">
                           {post.title}
                         </h3>
                         <p className="text-muted-foreground line-clamp-2 max-w-xl text-lg group-hover:text-foreground transition-colors">
@@ -370,7 +370,7 @@ const Blog = () => {
               className="max-w-xl mx-auto"
             >
               <span className="text-sm font-mono text-accent mb-6 block">NEWSLETTER</span>
-              <h2 className="text-3xl md:text-5xl lg:text-6xl font-syne font-bold mb-6">
+              <h2 className="text-3xl md:text-5xl lg:text-6xl font-sans font-bold mb-6">
                 Stay in the loop
               </h2>
               <p className="text-muted-foreground mb-10">

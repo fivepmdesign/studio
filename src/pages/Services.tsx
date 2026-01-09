@@ -1,7 +1,7 @@
 import { motion, useInView } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { useRef, useState } from 'react';
-import { ArrowRight, Check } from 'lucide-react';
+import { useRef, useState, useCallback } from 'react';
+import { ArrowRight, Check, Search } from 'lucide-react';
 import Footer from '@/components/Footer';
 import MagneticButton from '@/components/MagneticButton';
 import Navigation from '@/components/Navigation';
@@ -9,8 +9,8 @@ import Navigation from '@/components/Navigation';
 const services = [
   {
     id: 'brand-identity',
-    title: 'Brand Identity',
-    tagline: 'Define your visual story',
+    title: 'Free Plan',
+    tagline: 'Try V-TRY and see how it works without commitment',
     description: 'We craft comprehensive brand identities that communicate your values, differentiate you from competitors, and create lasting emotional connections with your audience.',
     features: [
       'Brand strategy & positioning',
@@ -20,15 +20,15 @@ const services = [
       'Collateral design',
       'Brand voice development',
     ],
-    startingPrice: '8,000',
+    startingPrice: '$0 - No credit card required',
     timeline: '4-6 weeks',
     popular: false,
     number: '01',
   },
   {
     id: 'web-design',
-    title: 'Web Design & Development',
-    tagline: 'Digital experiences that convert',
+    title: 'Pro Plan',
+    tagline: 'Great for regular use. Get a set of credits monthly',
     description: 'From concept to launch, we design and build stunning, high-performance websites that captivate visitors and drive business results.',
     features: [
       'UX research & strategy',
@@ -40,15 +40,15 @@ const services = [
       'Analytics setup',
       '3 months support',
     ],
-    startingPrice: '15,000',
+    startingPrice: '$24.99/month',
     timeline: '6-10 weeks',
     popular: true,
     number: '02',
   },
   {
     id: 'digital-campaign',
-    title: 'Digital Campaigns',
-    tagline: 'Stories that spread',
+    title: 'Ultra Plan',
+    tagline: 'For creators and power users who want more room to explore',
     description: 'We create integrated digital campaigns that capture attention, spark conversations, and drive measurable engagement across all platforms.',
     features: [
       'Campaign strategy',
@@ -58,42 +58,26 @@ const services = [
       'Motion graphics',
       'Performance tracking',
     ],
-    startingPrice: '12,000',
+    startingPrice: '$49.99/month',
     timeline: '3-5 weeks',
     popular: false,
     number: '03',
   },
-  {
-    id: 'product-design',
-    title: 'Product Design',
-    tagline: 'User-centered solutions',
-    description: 'We design intuitive digital products that users love. From initial research to final handoff, we ensure every interaction is thoughtful and purposeful.',
-    features: [
-      'User research & testing',
-      'Information architecture',
-      'Wireframing & prototyping',
-      'UI design system',
-      'Interaction design',
-      'Developer handoff',
-      'Design QA',
-    ],
-    startingPrice: '20,000',
-    timeline: '8-12 weeks',
-    popular: false,
-    number: '04',
-  },
 ];
 
 const addOns = [
-  { name: 'Motion Design Package', price: '3,000+', number: '01' },
-  { name: 'Photography Direction', price: '2,500+', number: '02' },
-  { name: 'Copywriting', price: '1,500+', number: '03' },
-  { name: 'Ongoing Retainer', price: '4,000/mo', number: '04' },
+  { name: '60 V-TRY Credits', price: '5.00', number: '01' },
+  { name: '170 V-TRY Credits', price: '12.00', number: '02' },
+  { name: '420 V-TRY Credits', price: '24.00', number: '03' },
+  { name: '820 V-TRY Credits', price: '48.00', number: '04'   },
 ];
 
 const Services = () => {
+  const categories = ['MONTHLY', 'YEARLY'];
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [activeService, setActiveService] = useState<number | null>(null);
+  const [activeCategory, setActiveCategory] = useState('MONTHLY');
+  const [searchQuery, setSearchQuery] = useState('');
   const heroRef = useRef(null);
   const servicesRef = useRef(null);
   const addOnsRef = useRef(null);
@@ -110,6 +94,10 @@ const Services = () => {
       y: (e.clientY - window.innerHeight / 2) / 30,
     });
   };
+
+  const handleSearch = useCallback((query: string) => {
+    setSearchQuery(query.toLowerCase());
+  }, []);
 
   return (
       <div className="min-h-screen bg-background" onMouseMove={handleMouseMove}>
@@ -177,7 +165,7 @@ const Services = () => {
                     initial={{ y: '100%' }}
                     animate={heroInView ? { y: 0 } : {}}
                     transition={{ duration: 1, delay: 0.2 + index * 0.1, ease: [0.19, 1, 0.22, 1] }}
-                    className={`font-syne font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[0.95] ${
+                    className={`font-sans font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[0.95] ${
                       index === 1 ? 'text-accent' : 'text-foreground'
                     }`}
                   >
@@ -215,13 +203,42 @@ const Services = () => {
                 <div className="h-px w-12 bg-accent" />
                 <span className="text-sm font-mono text-muted-foreground tracking-wider">WHAT WE OFFER</span>
               </div>
-              <h2 className="text-4xl md:text-6xl font-syne font-bold leading-tight max-w-3xl">
+              <h2 className="text-4xl md:text-6xl font-sans font-bold leading-tight max-w-3xl">
                 Comprehensive design solutions tailored to your needs.
               </h2>
             </motion.div>
 
+            {/* Filter Component */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={servicesInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="mb-12"
+            >
+              <div className="border border-border bg-card">
+                <div className="flex items-center h-full min-h-[4rem]">
+                  {categories.map((category) => (
+                    <button
+                      key={category}
+                      onClick={() => setActiveCategory(category)}
+                      className={`group relative h-16 px-8 flex items-center justify-center gap-2 text-sm font-mono uppercase tracking-wider transition-all hover:bg-accent hover:text-accent-foreground whitespace-nowrap border-r border-border last:border-r-0 ${
+                        activeCategory === category 
+                          ? 'bg-accent text-accent-foreground' 
+                          : 'text-muted-foreground bg-transparent'
+                      }`}
+                    >
+                      <span>{category}</span>
+                      {category === 'YEARLY' && (
+                        <span className="font-bold text-accent">SAVE 15%</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+
             {/* Interactive Grid */}
-            <div className="grid md:grid-cols-2 border-t border-l border-border">
+            <div className="grid md:grid-cols-3 border-t border-l border-border">
               {services.map((service, index) => (
                 <motion.div
                   key={service.id}
@@ -232,23 +249,34 @@ const Services = () => {
                   onMouseLeave={() => setActiveService(null)}
                   className="group relative border-r border-b border-border min-h-[500px] md:min-h-[600px] overflow-hidden bg-background"
                 >
+                  {/* Arrow - Fixed position top right */}
+                  <div className="absolute top-8 right-8 md:top-12 md:right-12 z-20 w-12 h-12 rounded-full border border-border flex items-center justify-center group-hover:bg-accent group-hover:text-accent-foreground group-hover:border-accent transition-all duration-500">
+                    <ArrowRight className="w-5 h-5 -rotate-45 group-hover:rotate-0 transition-transform duration-500" />
+                  </div>
+
                   {/* Default View (Always visible/background) */}
                   <div className="absolute inset-0 p-8 md:p-12 flex flex-col justify-between z-0">
                     <div className="flex justify-between items-start">
-                      <span className="text-6xl md:text-8xl font-syne font-bold text-foreground/5 group-hover:text-accent/10 transition-colors duration-500">
-                        {service.number}
+                      <span className="text-6xl md:text-8xl font-sans font-bold text-foreground/5 group-hover:text-accent/10 transition-colors duration-500">
+                        {service.startingPrice.includes('/month') ? (
+                          <>
+                            {service.startingPrice.split('/month')[0]}
+                            <span className="text-[0.4em]">/month</span>
+                          </>
+                        ) : service.startingPrice.startsWith('$0') ? (
+                          '$0'
+                        ) : (
+                          service.startingPrice
+                        )}
                       </span>
-                      <div className="w-12 h-12 rounded-full border border-border flex items-center justify-center group-hover:bg-accent group-hover:text-accent-foreground group-hover:border-accent transition-all duration-500">
-                        <ArrowRight className="w-5 h-5 -rotate-45 group-hover:rotate-0 transition-transform duration-500" />
-                      </div>
                     </div>
                     
                     <div className="space-y-4 mb-12 md:mb-0">
-                      <h3 className="text-4xl md:text-5xl lg:text-6xl font-syne font-bold leading-[0.9] group-hover:text-accent transition-colors duration-500">
+                      <h3 className="text-4xl md:text-5xl lg:text-6xl font-sans font-bold leading-[0.9] group-hover:text-accent transition-colors duration-500">
                         {service.title}
                       </h3>
                       <p className="text-sm font-mono tracking-wider text-muted-foreground uppercase">
-                        {service.tagline}
+                        {service.startingPrice}
                       </p>
                     </div>
                   </div>
@@ -273,7 +301,7 @@ const Services = () => {
                     <div className="flex items-end justify-between border-t border-border/50 pt-6">
                       <div>
                         <p className="text-xs font-mono text-muted-foreground mb-1">STARTING AT</p>
-                        <p className="text-3xl font-syne font-bold">${service.startingPrice}</p>
+                        <p className="text-3xl font-sans font-bold">{service.tagline}</p>
                       </div>
                       <Link 
                         to="/contact" 
@@ -302,11 +330,11 @@ const Services = () => {
               <div className="flex items-center justify-center gap-4 mb-6">
                 <span className="text-sm font-mono text-accent">03</span>
                 <div className="h-px w-12 bg-accent" />
-                <span className="text-sm font-mono text-muted-foreground tracking-wider">ADD-ONS</span>
+                <span className="text-sm font-mono text-muted-foreground tracking-wider">CREDITS TOP-UP</span>
               </div>
               
-              <h2 className="text-3xl md:text-5xl font-syne font-bold max-w-2xl mx-auto">
-                Enhance your project.
+              <h2 className="text-3xl md:text-5xl font-sans font-bold max-w-2xl mx-auto">
+                Credits can be used anytime and never expire
               </h2>
             </motion.div>
 
@@ -324,7 +352,7 @@ const Services = () => {
                     <span className="font-mono text-sm text-accent/50 group-hover:text-accent transition-colors duration-300">
                       {addon.number}
                     </span>
-                    <h3 className="text-3xl md:text-6xl font-syne font-bold text-foreground group-hover:text-accent group-hover:translate-x-4 transition-all duration-500 ease-out">
+                    <h3 className="text-3xl md:text-6xl font-sans font-bold text-foreground group-hover:text-accent group-hover:translate-x-4 transition-all duration-500 ease-out">
                       {addon.name}
                     </h3>
                   </div>
@@ -359,7 +387,7 @@ const Services = () => {
                 <span className="text-sm font-mono text-muted-foreground tracking-wider">OUR PROCESS</span>
               </div>
               
-              <h2 className="text-3xl md:text-5xl font-syne font-bold max-w-2xl mx-auto">
+              <h2 className="text-3xl md:text-5xl font-sans font-bold max-w-2xl mx-auto">
                 A proven methodology.
               </h2>
             </motion.div>
@@ -392,7 +420,7 @@ const Services = () => {
                   </div>
 
                   <div className="mt-auto">
-                    <h3 className="text-3xl font-syne font-bold mb-6 group-hover:text-background transition-colors duration-300">
+                    <h3 className="text-3xl font-sans font-bold mb-6 group-hover:text-background transition-colors duration-300">
                       {phase.title}
                     </h3>
                     <p className="text-muted-foreground leading-relaxed group-hover:text-background/80 transition-colors duration-300">
@@ -428,7 +456,7 @@ const Services = () => {
               transition={{ duration: 0.6 }}
             >
               <span className="text-sm font-mono text-accent mb-6 block">START TODAY</span>
-              <h2 className="text-3xl md:text-5xl lg:text-6xl font-syne font-bold mb-6">
+              <h2 className="text-3xl md:text-5xl lg:text-6xl font-sans font-bold mb-6">
                 Ready to start your project?
               </h2>
               <p className="text-muted-foreground max-w-xl mx-auto mb-10">

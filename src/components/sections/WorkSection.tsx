@@ -65,7 +65,7 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
 
           {/* Title & Arrow */}
           <div className="flex items-end justify-between gap-4 border-b border-border pb-6 group-hover:border-accent/50 transition-colors duration-500">
-            <h3 className="text-3xl md:text-4xl lg:text-5xl font-syne font-bold leading-tight group-hover:text-accent transition-colors duration-300">
+            <h3 className="text-3xl md:text-4xl lg:text-5xl font-sans font-bold leading-tight group-hover:text-accent transition-colors duration-300">
               {project.title}
             </h3>
             <ArrowUpRight className="w-8 h-8 text-muted-foreground group-hover:text-accent group-hover:-translate-y-2 group-hover:translate-x-2 transition-all duration-300 mb-1" />
@@ -85,7 +85,7 @@ export const WorkSection = () => {
       
       {/* Decorative large text background */}
       <div className="absolute top-20 left-0 w-full overflow-hidden opacity-[0.03] pointer-events-none select-none">
-         <h2 className="text-[20vw] font-syne font-black leading-none whitespace-nowrap animate-marquee">
+         <h2 className="text-[20vw] font-sans font-black leading-none whitespace-nowrap animate-marquee">
             SELECTED PROJECTS — SELECTED PROJECTS —
          </h2>
       </div>
@@ -99,7 +99,7 @@ export const WorkSection = () => {
                <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Featured Portfolio</span>
             </div>
             <AnimatedLine>
-              <h2 className="font-syne font-bold text-5xl md:text-7xl tracking-tighter leading-[0.9]">
+              <h2 className="font-sans font-bold text-5xl md:text-7xl tracking-tighter leading-[0.9]">
                 Crafting digital<br />
                 <span className="text-accent">masterpieces.</span>
               </h2>
