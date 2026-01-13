@@ -17,6 +17,27 @@ export const HeroSection = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [currentTime, setCurrentTime] = useState('');
   
+  const handleScrollToSection = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const targetElement = document.getElementById('how-it-works');
+    if (targetElement) {
+      // Try to use Lenis if available (for smooth scrolling)
+      const lenis = (window as any).lenis;
+      if (lenis) {
+        lenis.scrollTo(targetElement, {
+          offset: -80,
+          duration: 1.2,
+        });
+      } else {
+        // Fallback to native smooth scroll
+        targetElement.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    }
+  };
+  
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ['start start', 'end start'],
@@ -216,7 +237,7 @@ export const HeroSection = () => {
               transition={{ duration: 1, delay: 0.7 }}
             />
             <span className="text-xs sm:text-sm font-mono text-muted-foreground tracking-wider">
-              DIGITAL AGENCY — SINCE 2018
+              V-TRY is the ultimate AI virtual try-on platform
             </span>
           </motion.div>
 
@@ -277,8 +298,7 @@ export const HeroSection = () => {
               className="max-w-md"
             >
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed">
-                A creative studio crafting immersive digital products, brands, 
-                and experiences that captivate and inspire.
+                V-TRY lets you see clothes on yourself with AI — before you even think about buying.
               </p>
             </motion.div>
 
@@ -289,19 +309,20 @@ export const HeroSection = () => {
               className="flex flex-col sm:flex-row gap-3 sm:gap-4"
             >
               <MagneticButton>
-                <Link 
-                  to="/work" 
+                <a 
+                  href="#how-it-works" 
+                  onClick={handleScrollToSection}
                   className="group relative inline-flex items-center justify-center gap-3 px-6 sm:px-8 py-3 sm:py-4 bg-foreground text-background font-semibold rounded-full overflow-hidden text-sm sm:text-base w-full sm:w-auto"
                 >
-                  <span className="relative z-10">View Our Work</span>
+                  <span className="relative z-10">How it works</span>
                   <motion.div
                     className="relative z-10 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-background/20 flex items-center justify-center"
-                    whileHover={{ rotate: 45 }}
+                    whileHover={{ rotate: 180 }}
                     transition={{ duration: 0.3 }}
                   >
                     <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
                       <path
-                        d="M3 11L11 3M11 3H5M11 3V9"
+                        d="M3 5L7 9L11 5"
                         stroke="currentColor"
                         strokeWidth="1.5"
                         strokeLinecap="round"
@@ -315,7 +336,7 @@ export const HeroSection = () => {
                     whileHover={{ y: 0 }}
                     transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
                   />
-                </Link>
+                </a>
               </MagneticButton>
               
               <MagneticButton>
@@ -345,10 +366,10 @@ export const HeroSection = () => {
           >
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
               {[
-                { number: '150+', label: 'Projects Completed' },
-                { number: '50+', label: 'Happy Clients' },
-                { number: '12', label: 'Team Members' },
-                { number: '6+', label: 'Years Experience' },
+                { number: '250K+', label: 'Try-ons generated' },
+                { number: 'Seconds', label: 'Per generation' },
+                { number: 'Best in class', label: 'AI shopping assistant' },
+                { number: 'Private', label: 'By design' },
               ].map((stat, i) => (
                 <motion.div 
                   key={stat.label}

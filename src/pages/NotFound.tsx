@@ -1,5 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import { Helmet } from 'react-helmet-async';
 import Navigation from "@/components/Navigation";
 
 const NotFound = () => {
@@ -11,6 +12,9 @@ const NotFound = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <meta name="theme-color" content="#FF6B4A" />
+      </Helmet>
       <Navigation />
       <div className="flex min-h-[80vh] items-center justify-center">
       <div className="text-center">

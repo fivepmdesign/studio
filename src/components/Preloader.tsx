@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import appIcon from '@/assets/app-icon.svg';
 
 const phrases = [
   "Initializing...",
@@ -75,8 +76,11 @@ const Preloader = ({ onComplete }: { onComplete: () => void }) => {
                  transition={{ duration: 0.8, ease: easeInOutExpo, delay: 0.2 }}
                  className="flex items-center gap-3"
               >
-                 <div className="w-2 h-2 bg-white rounded-full"></div>
-                 <span className="font-sans font-bold text-white tracking-tight text-xl">STUDIO.</span>
+                 <img 
+                   src={appIcon} 
+                   alt="V-TRY" 
+                   className="w-8 h-8 md:w-10 md:h-10"
+                 />
               </motion.div>
            </div>
         </div>

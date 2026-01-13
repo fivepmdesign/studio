@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback, useRef } from 'react';
 import { motion, AnimatePresence, useInView, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { projects } from '@/data/projects';
 import SearchInput from '@/components/SearchInput';
 import Footer from '@/components/Footer';
@@ -126,6 +127,9 @@ const Projects = () => {
 
   return (
     <div className="min-h-screen bg-background" onMouseMove={handleMouseMove}>
+      <Helmet>
+        <meta name="theme-color" content="#FF6B4A" />
+      </Helmet>
       <Navigation />
 
       {/* Hero Section */}

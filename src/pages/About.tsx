@@ -2,6 +2,7 @@ import { motion, useInView } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useRef, useState } from 'react';
 import { ArrowRight, Linkedin, Twitter } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import Footer from '@/components/Footer';
 import MagneticButton from '@/components/MagneticButton';
 import Navigation from '@/components/Navigation';
@@ -121,6 +122,9 @@ const About = () => {
 
   return (
       <div className="min-h-screen bg-background" onMouseMove={handleMouseMove}>
+        <Helmet>
+          <meta name="theme-color" content="#FF6B4A" />
+        </Helmet>
         <Navigation />
 
         {/* Hero Section */}

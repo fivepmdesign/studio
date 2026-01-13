@@ -3,22 +3,51 @@
   <head>
 
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <title>STUDIO | Award-Winning Digital Agency</title>
-    <meta name="description" content="A creative digital studio crafting immersive digital products, brands, and experiences that captivate and inspire." />
-    <meta name="author" content="STUDIO" />
-    <meta name="theme-color" content="#0A0A0A" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Favicons for light and dark mode -->
+    <link rel="icon" type="image/png" href="/favicon-dark.png" id="theme-favicon" />
+    <!-- Fallback favicon -->
+    <link rel="icon" type="image/svg+xml" href="/app-icon.svg" />
+    <link rel="icon" type="image/x-icon" href="/app-icon.ico" />
+    <link rel="apple-touch-icon" href="/app-icon.svg" />
+    <script>
+      // Update favicon based on HTML class (dark/light)
+      function updateFavicon() {
+        const isDark = document.documentElement.classList.contains('dark');
+        const favicon = document.getElementById('theme-favicon');
+        if (favicon) {
+          favicon.href = isDark ? '/favicon-dark.png' : '/favicon-light.png';
+        }
+      }
+      // Update on load
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', updateFavicon);
+      } else {
+        updateFavicon();
+      }
+      // Watch for class changes
+      const observer = new MutationObserver(updateFavicon);
+      observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    </script>
+    <title>V-TRY | AI Virtual Try-On for Realistic Outfit Previews</title>
+    <meta name="description" content="Try on clothes virtually with V-TRY. Upload clothing photos and get realistic AI outfit previews using your own face—fast, private, and easy." />
+    <meta name="keywords" content="ai virtual try on, virtual fitting room, outfit try on ai, fashion ai, clothing preview ai" />
+    <meta name="author" content="V-TRY" />
+    <meta name="application-name" content="V-TRY" />
+    <meta name="apple-mobile-web-app-title" content="V-TRY" />
+    <meta name="theme-color" content="#FF6B4A" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://vtry.ai/" />
 
-    <meta property="og:title" content="STUDIO | Award-Winning Digital Agency" />
-    <meta property="og:description" content="A creative digital studio crafting immersive digital products, brands, and experiences that captivate and inspire." />
+    <meta property="og:title" content="V-TRY | AI Virtual Try-On for Realistic Outfit Previews" />
+    <meta property="og:description" content="Try on clothes virtually with V-TRY. Upload clothing photos and get realistic AI outfit previews using your own face—fast, private, and easy." />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="/favicon.svg" />
+    <meta property="og:image" content="/app-icon.svg" />
+    <meta property="og:url" content="https://vtry.ai/" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@studio" />
-    <meta name="twitter:image" content="/favicon.svg" />
+    <meta name="twitter:site" content="@vtry" />
+    <meta name="twitter:image" content="/app-icon.svg" />
   </head>
 
   <body>

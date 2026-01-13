@@ -2,28 +2,34 @@ import { motion, useInView } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
 import { AnimatedLine } from '@/components/AnimatedText';
 import { ChevronLeft, ChevronRight, Quote } from 'lucide-react';
+import avaImage from '@/assets/3_.jpg';
+import marthaImage from '@/assets/1_.jpg';
+import ethanImage from '@/assets/2_.jpg';
 
 const testimonials = [
   {
     id: 1,
-    quote: "Working with STUDIO was transformative. They didn't just deliver a website—they crafted an experience that perfectly captures our brand's essence.",
-    author: 'Sarah Chen',
-    role: 'CEO, Luminary Tech',
-    avatar: 'SC',
+    quote: "I finally know what suits me before buying — no returns needed!",
+    author: 'Ava G.',
+    role: 'United Kingdom',
+    avatar: 'A',
+    avatarImage: avaImage,
   },
   {
     id: 2,
-    quote: "Their attention to detail and creative vision exceeded every expectation. The results speak for themselves—our engagement has never been higher.",
-    author: 'Michael Rivera',
-    role: 'Founder, Cascade Ventures',
-    avatar: 'MR',
+    quote: "This feels like shopping in the future",
+    author: 'Martha V.',
+    role: 'Spain',
+    avatar: 'M',
+    avatarImage: marthaImage,
   },
   {
     id: 3,
-    quote: "A true partnership from day one. They challenged our thinking, pushed boundaries, and delivered work we're incredibly proud of.",
-    author: 'Emma Watson',
-    role: 'CMO, Ethereal Design',
-    avatar: 'EW',
+    quote: "The try-on videos look shockingly realistic. Game changer.",
+    author: 'Ethan M.',
+    role: 'Brazil',
+    avatar: 'E',
+    avatarImage: ethanImage,
   },
 ];
 
@@ -83,16 +89,10 @@ export const TestimonialsSection = () => {
               transition={{ duration: 0.8 }}
               className="flex items-center gap-4 mb-8"
             >
-              <span className="text-sm font-mono text-accent">05</span>
+              <span className="text-sm font-mono text-accent">V-TRY</span>
               <div className="h-px w-12 bg-accent" />
               <span className="text-sm font-mono text-muted-foreground tracking-wider">TESTIMONIALS</span>
             </motion.div>
-
-            <AnimatedLine delay={0.3}>
-              <h2 className="font-sans font-bold text-4xl sm:text-5xl md:text-6xl tracking-tight leading-[1.1]">
-                Words from those we've worked with.
-              </h2>
-            </AnimatedLine>
           </div>
 
           {/* Navigation arrows */}
@@ -146,12 +146,25 @@ export const TestimonialsSection = () => {
 
                   {/* Author */}
                   <div className="flex items-center gap-4 pt-6 border-t border-border/50">
-                    <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center font-sans font-bold text-accent">
-                      {testimonial.avatar}
-                    </div>
+                    {testimonial.avatarImage ? (
+                      <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+                        <img 
+                          src={testimonial.avatarImage} 
+                          alt={testimonial.author}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center font-sans font-bold text-accent">
+                        {testimonial.avatar}
+                      </div>
+                    )}
                     <div>
                       <span className="font-sans font-semibold block">{testimonial.author}</span>
                       <span className="text-sm text-muted-foreground">{testimonial.role}</span>
+                      {testimonial.tagline && (
+                        <span className="text-xs text-muted-foreground/70 italic mt-1 block">{testimonial.tagline}</span>
+                      )}
                     </div>
                   </div>
 
@@ -190,10 +203,10 @@ export const TestimonialsSection = () => {
           initial={{ opacity: 0, y: 40 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.6, duration: 0.8 }}
-          className="mt-20 md:mt-28 relative"
+          className="mt-32 md:mt-40 relative"
         >
           <div className="flex items-center justify-between mb-8">
-            <span className="text-sm font-mono text-muted-foreground">TRUSTED BY</span>
+            <span className="text-sm font-mono text-muted-foreground">AS SEEN ON</span>
             <div className="flex-1 h-px bg-border/50 ml-8" />
           </div>
 

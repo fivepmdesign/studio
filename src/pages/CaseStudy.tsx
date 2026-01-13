@@ -54,6 +54,7 @@ const CaseStudy = () => {
       <Helmet>
         <title>{project.title} | STUDIO Case Study</title>
         <meta name="description" content={project.description} />
+        <meta name="theme-color" content="#FF6B4A" />
       </Helmet>
 
       <CustomCursor />

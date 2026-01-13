@@ -14,12 +14,12 @@ interface SEOProps {
 }
 
 const defaultMeta = {
-  siteName: 'STUDIO',
-  title: 'STUDIO | Digital Design Agency',
-  description: 'We craft exceptional digital experiences through strategic design, innovative development, and creative storytelling. Transform your brand with our award-winning team.',
-  image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
-  url: 'https://studio.design',
-  twitterHandle: '@studiodesign',
+  siteName: 'V-TRY',
+  title: 'V-TRY | AI Virtual Try-On for Realistic Outfit Previews',
+  description: 'Try on clothes virtually with V-TRY. Upload clothing photos and get realistic AI outfit previews using your own face—fast, private, and easy.',
+  image: '/app-icon.svg',
+  url: 'https://vtry.ai/',
+  twitterHandle: '@vtry',
   locale: 'en_US',
 };
 
@@ -35,7 +35,7 @@ const SEO = ({
   section,
   tags = [],
 }: SEOProps) => {
-  const fullTitle = title ? `${title} | ${defaultMeta.siteName}` : defaultMeta.title;
+  const fullTitle = title || defaultMeta.title;
 
   return (
     <Helmet>
@@ -43,13 +43,16 @@ const SEO = ({
       <title>{fullTitle}</title>
       <meta name="title" content={fullTitle} />
       <meta name="description" content={description} />
+      <meta name="keywords" content="ai virtual try on, virtual fitting room, outfit try on ai, fashion ai, clothing preview ai" />
       <meta name="author" content={author || defaultMeta.siteName} />
+      <meta name="application-name" content="V-TRY" />
+      <meta name="apple-mobile-web-app-title" content="V-TRY" />
       <meta name="robots" content="index, follow" />
       <meta name="language" content="English" />
       <meta name="revisit-after" content="7 days" />
       
       {/* Canonical URL */}
-      <link rel="canonical" href={url} />
+      <link rel="canonical" href={url || defaultMeta.url} />
 
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={type} />
@@ -89,7 +92,7 @@ const SEO = ({
       <meta name="twitter:creator" content={defaultMeta.twitterHandle} />
 
       {/* Additional SEO */}
-      <meta name="theme-color" content="#0a0a0a" />
+      <meta name="theme-color" content="#FF6B4A" />
       <meta name="apple-mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     </Helmet>

@@ -1,0 +1,575 @@
+import { motion, useInView, AnimatePresence, LayoutGroup } from 'framer-motion';
+import { useRef, useState, useMemo, useEffect } from 'react';
+import { Search, Eye, Play, ShoppingCart, Trash2, Loader2 } from 'lucide-react';
+import Navigation from '@/components/Navigation';
+import CustomCursor from '@/components/CustomCursor';
+import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
+import feedImage from '@/assets/fdfe2e2o9llxd47t0tut.png';
+import feedImage2 from '@/assets/a847e240-d5da-49f8-9d11-2ec062e0f2de_p6c4s8.png';
+import feedVideo2 from '@/assets/879cf043-c82b-4225-975a-e824e9c5edb1.mp4';
+
+const categories = [
+  'All', 
+  'zara.com', 
+  'nike.com', 
+  'prada.com',
+  'amazon.com',
+  'shopify.com',
+  'etsy.com',
+  'ebay.com',
+  'asos.com',
+  'hm.com',
+  'uniqlo.com',
+  'adidas.com',
+  'gucci.com',
+  'versace.com'
+];
+
+const FeedItem = ({ index, isInView, feedImage, feedImage2, feedVideo2 }: {
+  index: number;
+  isInView: boolean;
+  feedImage: string;
+  feedImage2: string;
+  feedVideo2: string;
+}) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [videoProgress, setVideoProgress] = useState(0);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showHowDoILook, setShowHowDoILook] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showResult, setShowResult] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || index !== 1 || !isHovered) return;
+
+    const updateProgress = () => {
+      if (video.duration) {
+        setVideoProgress((video.currentTime / video.duration) * 100);
+      }
+    };
+
+    // Use timeupdate event for progress updates
+    video.addEventListener('timeupdate', updateProgress);
+    return () => video.removeEventListener('timeupdate', updateProgress);
+  }, [index, isHovered]);
+
+  // Handle "How do I look" click
+  useEffect(() => {
+    if (showHowDoILook) {
+      setIsLoading(true);
+      setShowResult(false);
+      
+      // Simulate loading time
+      const loadingTimer = setTimeout(() => {
+        setIsLoading(false);
+        setShowResult(true);
+      }, 2000);
+
+      return () => clearTimeout(loadingTimer);
+    } else {
+      setIsLoading(false);
+      setShowResult(false);
+    }
+  }, [showHowDoILook]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || index !== 1) return;
+
+    if (isHovered) {
+      video.play().catch(console.error);
+    } else {
+      video.pause();
+      video.currentTime = 0;
+      setVideoProgress(0);
+    }
+  }, [isHovered, index]);
+
+  const isVideoItem = index === 1;
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={isInView ? { opacity: 1, scale: 1 } : {}}
+      transition={{ duration: 1, delay: 0.3 + (index * 0.05), layout: { duration: 0.6, ease: [0.19, 1, 0.22, 1] } }}
+      className="relative w-full mb-8 lg:mb-10 break-inside-avoid group"
+      onMouseEnter={() => isVideoItem && setIsHovered(true)}
+      onMouseLeave={() => isVideoItem && setIsHovered(false)}
+    >
+      {/* Decorative frame */}
+      <motion.div 
+        className="absolute -top-4 -right-4 w-full h-full border border-accent/30 group-hover:border-accent transition-colors duration-500"
+        initial={{ opacity: 0, x: 20, y: -20 }}
+        animate={isInView ? { opacity: 1, x: 0, y: 0 } : {}}
+        transition={{ delay: 0.6 + (index * 0.05), duration: 0.8 }}
+      />
+      
+      <div className="relative overflow-hidden bg-secondary" data-feed-image>
+        {/* Image Container - maintains aspect ratio */}
+        <div className="relative" style={{ aspectRatio: '9/16' }}>
+          {/* Static Image */}
+          <motion.img
+            src={index === 1 ? feedImage2 : feedImage}
+            alt="V-TRY feed"
+            className="w-full h-full object-cover"
+            animate={{ 
+              opacity: isVideoItem && isHovered ? 0 : 1,
+              scale: isHovered ? 1.05 : 1
+            }}
+            transition={{ duration: 0.3 }}
+          />
+          
+          {/* Video - only for index 1 */}
+          {isVideoItem && (
+            <motion.video
+              ref={videoRef}
+              src={feedVideo2}
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover"
+              animate={{ 
+                opacity: isHovered ? 1 : 0
+              }}
+              transition={{ duration: 0.3 }}
+              style={{ pointerEvents: 'none' }}
+            />
+          )}
+          
+          <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
+          
+          {/* Corner decorations */}
+          <div className="absolute top-4 left-4 w-8 h-8 border-l-2 border-t-2 border-accent/50" />
+          <div className="absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2 border-accent/50" />
+        
+          {/* Progress Slider - only for video item */}
+          {isVideoItem && (
+            <div className="absolute bottom-0 left-0 right-0 h-1.5 z-50 px-1">
+              <div className="flex h-full gap-1.5">
+                {/* Static image indicator - shorter, fixed on left */}
+                <div className="h-full bg-accent/50 rounded-full" style={{ width: '25%' }} />
+                {/* Video progress - longer, fills as video progresses */}
+                <div className="h-full bg-background/30 flex-1 rounded-full relative overflow-hidden">
+                  <motion.div
+                    className="absolute inset-0 bg-accent rounded-full origin-left"
+                    animate={{ scaleX: videoProgress / 100 }}
+                    transition={{ duration: 0.1, ease: [0.4, 0, 0.2, 1] }}
+                    style={{ width: '100%' }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Icons vertical row - bottom right - positioned relative to image container */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 1.2 + (index * 0.05) }}
+            className="absolute bottom-8 right-8 flex flex-col gap-3 z-50"
+          >
+          {/* Delete Confirmation - shown when delete is clicked */}
+          {showDeleteConfirm ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="flex flex-col gap-2 items-end"
+            >
+              <div className="px-3 py-1.5 bg-background/95 backdrop-blur-sm border border-border rounded-full text-xs font-medium text-foreground mb-1">
+                Delete?
+              </div>
+              <div className="flex gap-2">
+                <motion.button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="px-3 py-1.5 bg-background/95 backdrop-blur-sm border border-destructive rounded-full text-xs font-medium text-destructive hover:bg-destructive hover:text-destructive-foreground transition-colors duration-300"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Yes
+                </motion.button>
+                <motion.button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="px-3 py-1.5 bg-background/95 backdrop-blur-sm border border-border rounded-full text-xs font-medium text-foreground hover:bg-muted transition-colors duration-300"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  No
+                </motion.button>
+              </div>
+            </motion.div>
+          ) : (
+            <>
+              <motion.div
+                className="relative flex items-center gap-2"
+                whileHover="hover"
+                initial="default"
+                animate={showDeleteConfirm ? { opacity: 0, scale: 0 } : { opacity: 1, scale: 1 }}
+              >
+                <motion.button
+                  onClick={() => setShowHowDoILook(!showHowDoILook)}
+                  className="relative w-8 h-8 flex items-center justify-center text-foreground/60 hover:text-accent transition-colors duration-300 group rounded-full hover:bg-accent/10"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <Eye className="w-5 h-5" strokeWidth={1.5} />
+                </motion.button>
+                <motion.div
+                  className="absolute right-full mr-2 flex items-center gap-2 whitespace-nowrap"
+                  variants={{
+                    default: { opacity: 0, x: 10, pointerEvents: 'none' },
+                    hover: { opacity: 1, x: 0, pointerEvents: 'auto' }
+                  }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="px-3 py-1.5 bg-background/95 backdrop-blur-sm border border-border rounded-full text-xs font-medium text-foreground flex items-center gap-2">
+                    <span>How do I look</span>
+                    <span className="px-1.5 py-0.5 bg-accent/20 text-accent rounded-full text-[10px] font-semibold">5</span>
+                  </div>
+                </motion.div>
+              </motion.div>
+              
+              <motion.div
+                className="relative flex items-center gap-2"
+                whileHover="hover"
+                initial="default"
+                animate={showDeleteConfirm ? { opacity: 0, scale: 0 } : { opacity: 1, scale: 1 }}
+              >
+                <motion.button
+                  className="relative w-8 h-8 flex items-center justify-center text-foreground/60 hover:text-accent transition-colors duration-300 group rounded-full hover:bg-accent/10"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <Play className="w-5 h-5" strokeWidth={1.5} />
+                </motion.button>
+                <motion.div
+                  className="absolute right-full mr-2 flex items-center gap-2 whitespace-nowrap"
+                  variants={{
+                    default: { opacity: 0, x: 10, pointerEvents: 'none' },
+                    hover: { opacity: 1, x: 0, pointerEvents: 'auto' }
+                  }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="px-3 py-1.5 bg-background/95 backdrop-blur-sm border border-border rounded-full text-xs font-medium text-foreground flex items-center gap-2">
+                    <span>Animate</span>
+                    <span className="px-1.5 py-0.5 bg-accent/20 text-accent rounded-full text-[10px] font-semibold">20</span>
+                  </div>
+                </motion.div>
+              </motion.div>
+              
+              <motion.div
+                className="relative flex items-center gap-2"
+                whileHover="hover"
+                initial="default"
+                animate={showDeleteConfirm ? { opacity: 0, scale: 0 } : { opacity: 1, scale: 1 }}
+              >
+                <motion.button
+                  className="relative w-8 h-8 flex items-center justify-center text-foreground/60 hover:text-accent transition-colors duration-300 group rounded-full hover:bg-accent/10"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <ShoppingCart className="w-5 h-5" strokeWidth={1.5} />
+                </motion.button>
+                <motion.div
+                  className="absolute right-full mr-2 flex items-center gap-2 whitespace-nowrap"
+                  variants={{
+                    default: { opacity: 0, x: 10, pointerEvents: 'none' },
+                    hover: { opacity: 1, x: 0, pointerEvents: 'auto' }
+                  }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="px-3 py-1.5 bg-background/95 backdrop-blur-sm border border-border rounded-full text-xs font-medium text-foreground">
+                    Buy now
+                  </div>
+                </motion.div>
+              </motion.div>
+              
+              <motion.div
+                className="relative flex items-center gap-2"
+                whileHover="hover"
+                initial="default"
+              >
+                <motion.button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="relative w-8 h-8 flex items-center justify-center text-foreground/60 hover:text-destructive transition-colors duration-300 group rounded-full hover:bg-destructive/10"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <Trash2 className="w-5 h-5" strokeWidth={1.5} />
+                </motion.button>
+                <motion.div
+                  className="absolute right-full mr-2 flex items-center gap-2 whitespace-nowrap"
+                  variants={{
+                    default: { opacity: 0, x: 10, pointerEvents: 'none' },
+                    hover: { opacity: 1, x: 0, pointerEvents: 'auto' }
+                  }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="px-3 py-1.5 bg-background/95 backdrop-blur-sm border border-border rounded-full text-xs font-medium text-foreground">
+                    Delete
+                  </div>
+                </motion.div>
+              </motion.div>
+            </>
+          )}
+          </motion.div>
+        </div>
+
+        {/* How do I look Panel - expands at bottom */}
+        <AnimatePresence>
+          {showHowDoILook && (
+            <motion.div
+              layout
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
+              className="overflow-hidden border-t border-border/50 bg-background/95 backdrop-blur-sm"
+            >
+              <div className="p-6">
+                <AnimatePresence mode="wait">
+                  {isLoading ? (
+                    <motion.div
+                      key="loading"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.3 }}
+                      className="flex items-center gap-3"
+                    >
+                      <Loader2 className="w-4 h-4 text-accent animate-spin" />
+                      <span className="text-sm font-mono text-foreground">Thinking...</span>
+                    </motion.div>
+                  ) : showResult ? (
+                    <motion.div
+                      key="result"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.4, delay: 0.1 }}
+                      className="space-y-3"
+                    >
+                      <p className="text-sm font-mono text-foreground leading-relaxed">
+                        This outfit complements your style beautifully. The fit appears well-proportioned, 
+                        and the color palette works harmoniously with your complexion. The silhouette creates 
+                        an elegant, modern look that would work well for both casual and semi-formal occasions.
+                      </p>
+                    </motion.div>
+                  ) : null}
+                </AnimatePresence>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </motion.div>
+  );
+};
+
+const Feed = () => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-100px' });
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [tagSearchQuery, setTagSearchQuery] = useState('');
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const filterRef = useRef(null);
+  const filterInView = useInView(filterRef, { once: true, margin: '-100px' });
+
+  // Filter categories based on search query
+  const filteredCategories = useMemo(() => {
+    if (!tagSearchQuery) return categories;
+    const query = tagSearchQuery.toLowerCase();
+    return categories.filter(category => 
+      category.toLowerCase().includes(query)
+    );
+  }, [tagSearchQuery]);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePosition({
+      x: (e.clientX - rect.left - rect.width / 2) / 30,
+      y: (e.clientY - rect.top - rect.height / 2) / 30,
+    });
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <SEO 
+        title="Feed"
+        description="V-TRY feed page"
+        url="https://studio.design/feed"
+      />
+
+      <CustomCursor />
+      
+      {/* Override custom cursor for feed images */}
+      <style>{`
+        [data-feed-image] img,
+        [data-feed-image] video {
+          cursor: default !important;
+        }
+      `}</style>
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      >
+        {/* Noise overlay for texture */}
+        <div className="noise-overlay" />
+        
+        <Navigation />
+        
+        <main>
+          <section 
+            ref={ref} 
+            onMouseMove={handleMouseMove}
+            className="section-padding bg-secondary/30 relative overflow-hidden"
+          >
+            {/* Grid overlay */}
+            <div className="absolute inset-0 pointer-events-none">
+              {[...Array(6)].map((_, i) => (
+                <motion.div
+                  key={`h-${i}`}
+                  className="absolute left-0 right-0 h-px bg-foreground/5"
+                  style={{ top: `${16.66 * (i + 1)}%` }}
+                  initial={{ scaleX: 0 }}
+                  animate={isInView ? { scaleX: 1 } : {}}
+                  transition={{ delay: i * 0.05, duration: 1.2 }}
+                />
+              ))}
+              {[...Array(4)].map((_, i) => (
+                <motion.div
+                  key={`v-${i}`}
+                  className="absolute top-0 bottom-0 w-px bg-foreground/5"
+                  style={{ left: `${25 * (i + 1)}%` }}
+                  initial={{ scaleY: 0 }}
+                  animate={isInView ? { scaleY: 1 } : {}}
+                  transition={{ delay: 0.2 + i * 0.05, duration: 1.2 }}
+                />
+              ))}
+            </div>
+
+            {/* Floating accent orb */}
+            <motion.div
+              className="absolute w-[400px] h-[400px] rounded-full bg-accent/5 blur-[100px] pointer-events-none"
+              style={{
+                x: mousePosition.x * 2,
+                y: mousePosition.y * 2,
+                top: '20%',
+                right: '10%',
+              }}
+            />
+
+            {/* Header and Filter */}
+            <div ref={filterRef} className="container-wide relative z-10 pb-12">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={filterInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6 }}
+                className="space-y-6"
+              >
+                <div className="flex items-center gap-4 mb-8">
+                  <span className="text-sm font-mono text-accent">V-TRY</span>
+                  <div className="h-px w-12 bg-accent" />
+                  <span className="text-sm font-mono text-muted-foreground tracking-wider">CLOSET</span>
+                </div>
+
+                <div className="border border-border bg-card">
+                  <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-border">
+                    {/* Categories */}
+                    <div className="flex-1 overflow-x-auto no-scrollbar">
+                      <div className="flex items-center h-full min-h-[4rem]">
+                        {filteredCategories.map((category) => (
+                          <button
+                            key={category}
+                            onClick={() => setActiveCategory(category)}
+                            className={`group relative h-16 px-8 flex items-center justify-center text-sm font-mono uppercase tracking-wider transition-all hover:bg-accent hover:text-accent-foreground whitespace-nowrap border-r border-border last:border-r-0 ${
+                              activeCategory === category 
+                                ? 'bg-accent text-accent-foreground' 
+                                : 'text-muted-foreground bg-transparent'
+                            }`}
+                          >
+                            {category}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Search */}
+                    <motion.div 
+                      className={`relative group bg-background/50 hover:bg-background transition-colors ${
+                        isSearchExpanded ? 'w-full md:w-[400px]' : 'w-16'
+                      }`}
+                      initial={false}
+                      transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
+                    >
+                      <div className="relative h-16 flex items-center">
+                        {isSearchExpanded ? (
+                          <div className="w-full px-6 flex items-center">
+                            <Search className="w-5 h-5 text-muted-foreground mr-4 flex-shrink-0" />
+                            <input 
+                              type="text"
+                              placeholder="Search websites"
+                              value={tagSearchQuery}
+                              onChange={(e) => setTagSearchQuery(e.target.value)}
+                              onBlur={() => {
+                                if (!tagSearchQuery) {
+                                  setIsSearchExpanded(false);
+                                }
+                              }}
+                              autoFocus
+                              className="flex-1 bg-transparent border-none outline-none text-sm font-mono text-foreground placeholder:text-muted-foreground/50 h-full min-w-0"
+                            />
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setIsSearchExpanded(true)}
+                            className="w-full h-16 flex items-center justify-center hover:bg-background transition-colors"
+                          >
+                            <Search className="w-5 h-5 text-muted-foreground" />
+                          </button>
+                        )}
+                      </div>
+                    </motion.div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+
+            <div className="container-wide relative z-10">
+              <LayoutGroup>
+                <motion.div 
+                  layout
+                  className="columns-1 sm:columns-2 lg:columns-3"
+                  style={{ columnGap: '2rem' }}
+                  transition={{ layout: { duration: 0.6, ease: [0.19, 1, 0.22, 1] } }}
+                >
+                  {Array.from({ length: 16 }).map((_, index) => (
+                    <FeedItem
+                      key={index}
+                      index={index}
+                      isInView={isInView}
+                      feedImage={feedImage}
+                      feedImage2={feedImage2}
+                      feedVideo2={feedVideo2}
+                    />
+                  ))}
+                </motion.div>
+              </LayoutGroup>
+            </div>
+          </section>
+        </main>
+        
+        <Footer />
+      </motion.div>
+    </div>
+  );
+};
+
+export default Feed;

@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { ArrowUpRight, Search } from 'lucide-react';
 import { blogPosts } from '@/data/blog';
 import SearchInput from '@/components/SearchInput';
@@ -54,6 +55,9 @@ const Blog = () => {
 
   return (
       <div className="min-h-screen bg-background" onMouseMove={handleMouseMove}>
+        <Helmet>
+          <meta name="theme-color" content="#FF6B4A" />
+        </Helmet>
         <Navigation />
 
         {/* Hero Section */}

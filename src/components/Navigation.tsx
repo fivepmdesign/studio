@@ -9,7 +9,9 @@ const navLinks = [
   { name: 'About', href: '/about', number: '02' },
   { name: 'Pricing', href: '/pricing', number: '03' },
   { name: 'Blog', href: '/blog', number: '04' },
-  { name: 'Contact', href: '/contact', number: '05' },
+  { name: 'Download', href: '/download', number: '05' },
+  { name: 'Feed', href: '/feed', number: '06' },
+  { name: 'Account', href: '/account', number: '07' },
 ];
 
 export const Navigation = () => {
@@ -180,23 +182,17 @@ export const Navigation = () => {
               
               <div className="flex items-center gap-2">
                 {/* CTA Button */}
-                <Link 
-                  to="/contact" 
+                  <Link 
+                    to="/login" 
                   className="px-5 py-2.5 bg-foreground text-background rounded-full text-sm font-semibold hover:bg-accent hover:text-accent-foreground transition-colors duration-300"
                 >
                   Get started
-                </Link>
+                  </Link>
               </div>
             </div>
 
             {/* Tablet Navigation */}
             <div className="hidden md:flex lg:hidden items-center gap-4">
-              <Link 
-                to="/contact"
-                className="px-4 py-2 bg-foreground text-background text-sm font-medium rounded-full"
-              >
-                Contact
-              </Link>
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="relative z-50 w-10 h-10 flex items-center justify-center bg-muted/40 rounded-full"
@@ -393,7 +389,7 @@ export const Navigation = () => {
                 </div>
                 
                 <Link
-                  to="/contact"
+                  to="/login"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="group inline-flex items-center gap-3 px-6 py-3 bg-accent text-accent-foreground font-semibold rounded-full"
                 >

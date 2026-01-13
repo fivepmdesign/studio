@@ -18,6 +18,9 @@ export const SmoothScroll = ({ children }: SmoothScrollProps) => {
       smoothWheel: true,
     });
 
+    // Expose Lenis instance on window for programmatic scrolling
+    (window as any).lenis = lenisRef.current;
+
     function raf(time: number) {
       lenisRef.current?.raf(time);
       requestAnimationFrame(raf);
@@ -26,6 +29,7 @@ export const SmoothScroll = ({ children }: SmoothScrollProps) => {
     requestAnimationFrame(raf);
     return () => {
       lenisRef.current?.destroy();
+      delete (window as any).lenis;
     };
   }, []);
 
