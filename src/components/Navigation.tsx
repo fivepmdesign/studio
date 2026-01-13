@@ -1,17 +1,37 @@
 import { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
+import { User } from 'lucide-react';
 import MagneticButton from './MagneticButton';
+import TopUpModal from './TopUpModal';
 import appIcon from '@/assets/app-icon.svg';
+import exampleUserPhoto from '@/assets/photo.png';
+
+// Plan configuration - should match Account page
+const PLAN_CONFIG = {
+  free: {
+    name: 'Free plan',
+    creditsTotal: 90,
+  },
+  pro: {
+    name: 'Pro plan',
+    creditsTotal: 320,
+  },
+  ultra: {
+    name: 'Ultra plan',
+    creditsTotal: 750,
+  },
+};
+
+// Current plan - switch between 'free', 'pro', 'ultra'
+const CURRENT_PLAN = 'free';
 
 const navLinks = [
-  { name: 'Work', href: '/work', number: '01' },
-  { name: 'About', href: '/about', number: '02' },
-  { name: 'Pricing', href: '/pricing', number: '03' },
-  { name: 'Blog', href: '/blog', number: '04' },
-  { name: 'Download', href: '/download', number: '05' },
-  { name: 'Feed', href: '/feed', number: '06' },
-  { name: 'Account', href: '/account', number: '07' },
+  { name: 'Pricing', href: '/pricing', number: '01' },
+  { name: 'Download', href: '/download', number: '02' },
+  { name: 'Feed', href: '/feed', number: '03' },
+  { name: 'Onboarding', href: '/onboarding', number: '04' },
+  { name: 'Account', href: '/account', number: '05' },
 ];
 
 export const Navigation = () => {
@@ -19,7 +39,21 @@ export const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [isTopUpModalOpen, setIsTopUpModalOpen] = useState(false);
   const location = useLocation();
+  
+  // Mock user data - replace with actual user data from auth
+  const userCredits = 49;
+  // In production, get this from your auth system (e.g., user?.imageUrl, user?.photo, etc.)
+  // For demo purposes, set to exampleUserPhoto to show the photo feature
+  // Set to null to show the placeholder icon
+  const userPhoto: string | null = exampleUserPhoto; // Replace with actual user photo URL from auth system
+  
+  // Credit warning logic - highlight in red if credits are less than 20
+  const isLowCredits = userCredits < 20;
+  
+  // Determine if user has a photo
+  const hasUserPhoto = userPhoto !== null && userPhoto !== undefined;
 
   // Smooth cursor follower for nav
   const cursorX = useMotionValue(0);
@@ -181,6 +215,45 @@ export const Navigation = () => {
               <div className={`w-px h-6 mx-4 transition-colors duration-500 ${isScrolled ? 'bg-border/50' : 'bg-transparent'}`} />
               
               <div className="flex items-center gap-2">
+                {/* Credits Button */}
+                <button
+                  onClick={() => setIsTopUpModalOpen(true)}
+                  className={`group relative px-3 py-2.5 border rounded-full bg-background/80 backdrop-blur-sm transition-all duration-300 h-[38px] flex items-center gap-1.5 ${
+                    isLowCredits 
+                      ? 'border-red-500/50 bg-red-500/10 hover:bg-red-500/20 hover:border-red-500' 
+                      : 'border-border hover:bg-accent/10 hover:border-accent'
+                  }`}
+                >
+                  <span className={`text-sm font-mono font-semibold transition-colors ${
+                    isLowCredits 
+                      ? 'text-red-600 dark:text-red-500 group-hover:text-red-600 dark:group-hover:text-red-500' 
+                      : 'text-foreground group-hover:text-accent'
+                  }`}>
+                    {userCredits.toLocaleString()}
+                  </span>
+                  {isLowCredits && (
+                    <span className="text-xs font-mono text-red-600 dark:text-red-500">
+                      remaining
+                    </span>
+                  )}
+                </button>
+                
+                {/* User Photo Circle Button - Clickable to Account */}
+                <Link
+                  to="/account"
+                  className="relative w-[38px] h-[38px] rounded-full bg-accent/20 border-2 border-accent/30 flex items-center justify-center overflow-hidden flex-shrink-0 hover:border-accent hover:bg-accent/30 transition-all duration-300"
+                >
+                  {hasUserPhoto ? (
+                    <img 
+                      src={userPhoto} 
+                      alt="User" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-4 h-4 text-accent" strokeWidth={2} />
+                  )}
+                </Link>
+                
                 {/* CTA Button */}
                   <Link 
                     to="/login" 
@@ -414,6 +487,9 @@ export const Navigation = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      
+      {/* Top-Up Modal */}
+      <TopUpModal isOpen={isTopUpModalOpen} onClose={() => setIsTopUpModalOpen(false)} />
     </>
   );
 };

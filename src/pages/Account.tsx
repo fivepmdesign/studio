@@ -6,35 +6,58 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import personaPhoto from '@/assets/photo.png';
+import exampleUserPhoto from '@/assets/photo.png';
 import frontView from '@/assets/Front view 1.png';
 import backView from '@/assets/Back view.png';
 import sideView from '@/assets/Side view.png';
 import threeFourView from '@/assets/3-4 view.png';
 
+// Plan configuration
+const PLAN_CONFIG = {
+  free: {
+    name: 'Free plan',
+    creditsTotal: 90,
+    renewsOn: null, // Free plan doesn't renew
+  },
+  pro: {
+    name: 'Pro plan',
+    creditsTotal: 320,
+    renewsOn: 'Nov, 16',
+  },
+  ultra: {
+    name: 'Ultra plan',
+    creditsTotal: 750,
+    renewsOn: 'Nov, 16',
+  },
+};
+
+// Current plan - switch between 'free', 'pro', 'ultra'
+const CURRENT_PLAN = 'free';
+
 const services = [
   {
     pill: 'SUBSCRIPTION',
-    title: 'Pro plan',
-    subtitle: 'Your plan renews on Nov, 16',
+    title: CURRENT_PLAN === 'free' ? 'Free plan' : PLAN_CONFIG[CURRENT_PLAN as keyof typeof PLAN_CONFIG].name,
+    subtitle: CURRENT_PLAN === 'free' ? 'No renewal' : `Your plan renews on ${PLAN_CONFIG[CURRENT_PLAN as keyof typeof PLAN_CONFIG].renewsOn}`,
     number: '01',
     width: '1/3',
     cta: 'Manage plan',
   },
   {
     pill: 'CREDITS',
-    title: '614',
-    titleSuffix: '/1200',
-    subtitle: 'Monthly credits',
+    title: '49',
+    titleSuffix: `/${PLAN_CONFIG[CURRENT_PLAN as keyof typeof PLAN_CONFIG].creditsTotal}`,
+    subtitle: 'Resets in 19 days',
     number: '02',
     width: '2/3',
     cta: 'BUY CREDITS',
-    creditsUsed: 614,
-    creditsTotal: 1200,
+    creditsUsed: 49,
+    creditsTotal: PLAN_CONFIG[CURRENT_PLAN as keyof typeof PLAN_CONFIG].creditsTotal,
   },
   {
     pill: 'UPCOMING INVOICES',
     title: 'Upcoming Invoices',
-    description: 'Review and manage your upcoming billing statements.',
+    subtitle: 'Review and manage your upcoming billing statements.',
     number: '03',
     width: '1/2',
     cta: 'View all Invoices',
@@ -42,7 +65,7 @@ const services = [
   {
     pill: 'PAYMENT METHODS',
     title: 'Payment Methods',
-    description: 'Credit card - Stripe',
+    subtitle: 'Credit card - Stripe',
     number: '04',
     width: '1/2',
     cta: 'Manage billing information',
@@ -54,9 +77,10 @@ interface ServiceCardProps {
   index: number;
   activeIndex: number | null;
   setActiveIndex: (index: number | null) => void;
+  isLowCredits?: boolean;
 }
 
-const ServiceCard = ({ service, index, activeIndex, setActiveIndex }: ServiceCardProps) => {
+const ServiceCard = ({ service, index, activeIndex, setActiveIndex, isLowCredits = false }: ServiceCardProps) => {
   const isActive = activeIndex === index;
 
   return (
@@ -69,27 +93,37 @@ const ServiceCard = ({ service, index, activeIndex, setActiveIndex }: ServiceCar
       onMouseLeave={() => setActiveIndex(null)}
       className="group relative"
     >
-      <div className={`relative h-full p-10 md:p-12 border transition-all duration-500 flex flex-col overflow-hidden ${
+      <div className={`relative h-full min-h-[280px] p-10 md:p-12 border transition-all duration-500 flex flex-col overflow-hidden ${
         isActive 
           ? 'bg-accent/5 border-accent/30' 
           : 'bg-card/30 border-border/50 hover:border-border'
       }`}>
-        {/* Credit Consumption Gradient (only for credits card) */}
-        {service.creditsUsed !== undefined && service.creditsTotal !== undefined && (
-          <>
-            <div 
-              className="absolute inset-0 pointer-events-none z-0"
-              style={{
-                background: `linear-gradient(to right, rgba(255, 107, 74, 0.12) 0%, rgba(255, 107, 74, 0.12) ${(service.creditsUsed / service.creditsTotal) * 100}%, transparent ${(service.creditsUsed / service.creditsTotal) * 100}%, transparent 100%)`
-              }}
-            />
-            <div className="absolute top-1/2 right-8 -translate-y-1/2 pointer-events-none z-10">
-              <span className="text-2xl md:text-3xl font-sans font-bold text-accent/50">
-                {Math.round((service.creditsUsed / service.creditsTotal) * 100)}%
-              </span>
-            </div>
-          </>
-        )}
+        {/* Credit Consumption Gradient (only for credits card) - Shows consumption percentage */}
+        {service.creditsUsed !== undefined && service.creditsTotal !== undefined && (() => {
+          // Calculate consumed credits and percentage dynamically
+          const creditsRemaining = service.creditsUsed; // Note: creditsUsed actually represents remaining credits
+          const creditsConsumed = service.creditsTotal - creditsRemaining;
+          const consumptionPercentage = (creditsConsumed / service.creditsTotal) * 100;
+          
+          return (
+            <>
+              <div 
+                className="absolute inset-0 pointer-events-none z-0"
+                style={{
+                  background: `linear-gradient(to right, rgba(255, 107, 74, 0.12) 0%, rgba(255, 107, 74, 0.12) ${consumptionPercentage}%, transparent ${consumptionPercentage}%, transparent 100%)`
+                }}
+              />
+              <div className="absolute top-1/2 right-8 -translate-y-1/2 pointer-events-none z-10 flex flex-col items-end">
+                <span className="text-2xl md:text-3xl font-sans font-bold text-accent/50">
+                  {Math.round(consumptionPercentage)}%
+                </span>
+                <span className="text-sm font-mono text-muted-foreground/60">
+                  consumed
+                </span>
+              </div>
+            </>
+          );
+        })()}
         {/* Number */}
         <motion.span 
           className={`absolute top-4 right-4 text-xs font-mono transition-colors duration-300 ${
@@ -132,6 +166,11 @@ const ServiceCard = ({ service, index, activeIndex, setActiveIndex }: ServiceCar
         {service.subtitle && (
           <p className="text-sm text-muted-foreground mb-3 relative z-10">
             {service.subtitle}
+          </p>
+        )}
+        {isLowCredits && service.creditsUsed !== undefined && (
+          <p className="text-sm font-mono text-red-600 dark:text-red-500 mb-3 relative z-10 font-semibold">
+            {service.creditsUsed} credits remaining
           </p>
         )}
         {service.description && (
@@ -239,6 +278,22 @@ const Account = () => {
     2: 'Persona 2',
     3: 'Persona 3',
   });
+  
+  // Mock user data - replace with actual user data from auth
+  // In production, get this from your auth system (e.g., user?.imageUrl, user?.photo, etc.)
+  // For demo purposes, set to exampleUserPhoto to show the photo feature
+  // Set to null to show the placeholder icon
+  const userPhoto: string | null = exampleUserPhoto; // Replace with actual user photo URL from auth system
+  
+  // Determine if user has a photo
+  const hasUserPhoto = userPhoto !== null && userPhoto !== undefined;
+  
+  // Get current plan configuration
+  const currentPlanConfig = PLAN_CONFIG[CURRENT_PLAN as keyof typeof PLAN_CONFIG];
+  
+  // Credit warning logic - highlight in red if credits are less than 20
+  const creditsCount = services[1].creditsUsed || 0;
+  const isLowCredits = creditsCount < 20;
 
   return (
     <div className="min-h-screen bg-background">
@@ -321,7 +376,15 @@ const Account = () => {
 
                 {/* Round Avatar */}
                 <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0 relative overflow-hidden border-2 border-accent/30">
-                  <User className="w-10 h-10 md:w-12 md:h-12 text-accent" strokeWidth={1.5} />
+                  {hasUserPhoto ? (
+                    <img 
+                      src={userPhoto} 
+                      alt="User" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-10 h-10 md:w-12 md:h-12 text-accent" strokeWidth={1.5} />
+                  )}
                 </div>
 
                 {/* Content */}
@@ -408,6 +471,7 @@ const Account = () => {
                     index={1}
                     activeIndex={activeIndex}
                     setActiveIndex={setActiveIndex}
+                    isLowCredits={isLowCredits}
                   />
                 </div>
               </div>

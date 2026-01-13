@@ -1,10 +1,11 @@
 import { motion, useInView, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { useRef, useState, useMemo, useEffect } from 'react';
-import { Search, Eye, Play, ShoppingCart, Trash2, Loader2 } from 'lucide-react';
+import { Search, Eye, Play, ShoppingCart, Trash2, Loader2, Upload, X, Image as ImageIcon } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import CustomCursor from '@/components/CustomCursor';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import feedImage from '@/assets/fdfe2e2o9llxd47t0tut.png';
 import feedImage2 from '@/assets/a847e240-d5da-49f8-9d11-2ec062e0f2de_p6c4s8.png';
 import feedVideo2 from '@/assets/879cf043-c82b-4225-975a-e824e9c5edb1.mp4';
@@ -25,6 +26,35 @@ const categories = [
   'gucci.com',
   'versace.com'
 ];
+
+const popularFashionSites = [
+  { name: 'Zara', url: 'https://www.zara.com' },
+  { name: 'ASOS', url: 'https://www.asos.com' },
+  { name: 'Nike', url: 'https://www.nike.com' },
+  { name: 'H&M', url: 'https://www.hm.com' },
+  { name: 'Uniqlo', url: 'https://www.uniqlo.com' },
+  { name: 'Adidas', url: 'https://www.adidas.com' },
+  { name: 'Gucci', url: 'https://www.gucci.com' },
+  { name: 'Prada', url: 'https://www.prada.com' },
+  { name: 'Versace', url: 'https://www.versace.com' },
+  { name: 'Farfetch', url: 'https://www.farfetch.com' },
+  { name: 'Net-a-Porter', url: 'https://www.net-a-porter.com' },
+  { name: 'SSENSE', url: 'https://www.ssense.com' },
+  { name: 'Mytheresa', url: 'https://www.mytheresa.com' },
+  { name: 'Matches Fashion', url: 'https://www.matchesfashion.com' },
+  { name: 'Nordstrom', url: 'https://www.nordstrom.com' },
+  { name: 'Saks Fifth Avenue', url: 'https://www.saksfifthavenue.com' },
+  { name: 'Revolve', url: 'https://www.revolve.com' },
+  { name: 'Shopbop', url: 'https://www.shopbop.com' },
+  { name: 'Boohoo', url: 'https://www.boohoo.com' },
+  { name: 'Shein', url: 'https://www.shein.com' },
+];
+
+// Helper function to add v-try.ai referral parameter
+const addVTryReferral = (url: string): string => {
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}ref=v-try.ai`;
+};
 
 const FeedItem = ({ index, isInView, feedImage, feedImage2, feedVideo2 }: {
   index: number;
@@ -377,8 +407,24 @@ const Feed = () => {
   const [activeCategory, setActiveCategory] = useState('All');
   const [tagSearchQuery, setTagSearchQuery] = useState('');
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState('');
+  const [isLoadingUrl, setIsLoadingUrl] = useState(false);
+  const [hasGenerations, setHasGenerations] = useState(true); // Set to false to show empty state (also controls website tags visibility)
+  const [selectedSites, setSelectedSites] = useState<typeof popularFashionSites>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const filterRef = useRef(null);
   const filterInView = useInView(filterRef, { once: true, margin: '-100px' });
+
+  // Randomly select 3-5 fashion sites on each page load
+  useEffect(() => {
+    const shuffled = [...popularFashionSites].sort(() => Math.random() - 0.5);
+    const count = Math.floor(Math.random() * 3) + 3; // 3-5 sites
+    setSelectedSites(shuffled.slice(0, count));
+  }, []);
 
   // Filter categories based on search query
   const filteredCategories = useMemo(() => {
@@ -395,6 +441,85 @@ const Feed = () => {
       x: (e.clientX - rect.left - rect.width / 2) / 30,
       y: (e.clientY - rect.top - rect.height / 2) / 30,
     });
+  };
+
+  const handleFileSelect = (file: File) => {
+    setSelectedFile(file);
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileSelect(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      handleFileSelect(file);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsUploadModalOpen(false);
+    setSelectedFile(null);
+    setImageUrl('');
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+    }
+  };
+
+  const handleImportFromUrl = async () => {
+    if (!imageUrl.trim()) return;
+    
+    setIsLoadingUrl(true);
+    try {
+      // Validate URL
+      const url = new URL(imageUrl);
+      
+      // Fetch the image
+      const response = await fetch(imageUrl, { mode: 'cors' });
+      if (!response.ok) throw new Error('Failed to fetch image');
+      
+      const blob = await response.blob();
+      if (!blob.type.startsWith('image/')) {
+        throw new Error('URL does not point to an image');
+      }
+      
+      // Create a file from the blob
+      const file = new File([blob], url.pathname.split('/').pop() || 'image.jpg', { type: blob.type });
+      handleFileSelect(file);
+      setImageUrl('');
+    } catch (error) {
+      console.error('Error importing from URL:', error);
+      alert('Failed to import image from URL. Please check the URL and try again.');
+    } finally {
+      setIsLoadingUrl(false);
+    }
+  };
+
+  const handleUpload = () => {
+    if (selectedFile || previewUrl) {
+      // TODO: Implement actual upload logic
+      console.log('Uploading file:', selectedFile || previewUrl);
+      handleCloseModal();
+    }
   };
 
   return (
@@ -474,100 +599,406 @@ const Feed = () => {
                 transition={{ duration: 0.6 }}
                 className="space-y-6"
               >
-                <div className="flex items-center gap-4 mb-8">
-                  <span className="text-sm font-mono text-accent">V-TRY</span>
-                  <div className="h-px w-12 bg-accent" />
-                  <span className="text-sm font-mono text-muted-foreground tracking-wider">CLOSET</span>
-                </div>
-
-                <div className="border border-border bg-card">
-                  <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-border">
-                    {/* Categories */}
-                    <div className="flex-1 overflow-x-auto no-scrollbar">
-                      <div className="flex items-center h-full min-h-[4rem]">
-                        {filteredCategories.map((category) => (
-                          <button
-                            key={category}
-                            onClick={() => setActiveCategory(category)}
-                            className={`group relative h-16 px-8 flex items-center justify-center text-sm font-mono uppercase tracking-wider transition-all hover:bg-accent hover:text-accent-foreground whitespace-nowrap border-r border-border last:border-r-0 ${
-                              activeCategory === category 
-                                ? 'bg-accent text-accent-foreground' 
-                                : 'text-muted-foreground bg-transparent'
-                            }`}
-                          >
-                            {category}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Search */}
-                    <motion.div 
-                      className={`relative group bg-background/50 hover:bg-background transition-colors ${
-                        isSearchExpanded ? 'w-full md:w-[400px]' : 'w-16'
-                      }`}
-                      initial={false}
-                      transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
-                    >
-                      <div className="relative h-16 flex items-center">
-                        {isSearchExpanded ? (
-                          <div className="w-full px-6 flex items-center">
-                            <Search className="w-5 h-5 text-muted-foreground mr-4 flex-shrink-0" />
-                            <input 
-                              type="text"
-                              placeholder="Search websites"
-                              value={tagSearchQuery}
-                              onChange={(e) => setTagSearchQuery(e.target.value)}
-                              onBlur={() => {
-                                if (!tagSearchQuery) {
-                                  setIsSearchExpanded(false);
-                                }
-                              }}
-                              autoFocus
-                              className="flex-1 bg-transparent border-none outline-none text-sm font-mono text-foreground placeholder:text-muted-foreground/50 h-full min-w-0"
-                            />
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => setIsSearchExpanded(true)}
-                            className="w-full h-16 flex items-center justify-center hover:bg-background transition-colors"
-                          >
-                            <Search className="w-5 h-5 text-muted-foreground" />
-                          </button>
-                        )}
-                      </div>
-                    </motion.div>
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8 mb-8">
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm font-mono text-accent">V-TRY</span>
+                    <div className="h-px w-12 bg-accent" />
+                    <span className="text-sm font-mono text-muted-foreground tracking-wider">CLOSET</span>
                   </div>
+                  
+                  {hasGenerations && (
+                    <motion.button
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={filterInView ? { opacity: 1, y: 0 } : {}}
+                      transition={{ delay: 0.5 }}
+                      onClick={() => setIsUploadModalOpen(true)}
+                      className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-foreground hover:text-accent transition-colors"
+                    >
+                      Upload
+                      <Upload className="w-4 h-4" strokeWidth={2} />
+                    </motion.button>
+                  )}
                 </div>
+
+                {hasGenerations && (
+                  <div className="border border-border bg-card">
+                    <div className="flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-border">
+                      {/* Categories */}
+                      <div className="flex-1 overflow-x-auto no-scrollbar">
+                        <div className="flex items-center h-full min-h-[4rem]">
+                          {filteredCategories.map((category) => (
+                            <button
+                              key={category}
+                              onClick={() => setActiveCategory(category)}
+                              className={`group relative h-16 px-8 flex items-center justify-center text-sm font-mono uppercase tracking-wider transition-all hover:bg-accent hover:text-accent-foreground whitespace-nowrap border-r border-border last:border-r-0 ${
+                                activeCategory === category 
+                                  ? 'bg-accent text-accent-foreground' 
+                                  : 'text-muted-foreground bg-transparent'
+                              }`}
+                            >
+                              {category}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Search */}
+                      <motion.div 
+                        className={`relative group bg-background/50 hover:bg-background transition-colors ${
+                          isSearchExpanded ? 'w-full md:w-[400px]' : 'w-16'
+                        }`}
+                        initial={false}
+                        transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
+                      >
+                        <div className="relative h-16 flex items-center">
+                          {isSearchExpanded ? (
+                            <div className="w-full px-6 flex items-center">
+                              <Search className="w-5 h-5 text-muted-foreground mr-4 flex-shrink-0" />
+                              <input 
+                                type="text"
+                                placeholder="Search websites"
+                                value={tagSearchQuery}
+                                onChange={(e) => setTagSearchQuery(e.target.value)}
+                                onBlur={() => {
+                                  if (!tagSearchQuery) {
+                                    setIsSearchExpanded(false);
+                                  }
+                                }}
+                                autoFocus
+                                className="flex-1 bg-transparent border-none outline-none text-sm font-mono text-foreground placeholder:text-muted-foreground/50 h-full min-w-0"
+                              />
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setIsSearchExpanded(true)}
+                              className="w-full h-16 flex items-center justify-center hover:bg-background transition-colors"
+                            >
+                              <Search className="w-5 h-5 text-muted-foreground" />
+                            </button>
+                          )}
+                        </div>
+                      </motion.div>
+                    </div>
+                  </div>
+                )}
               </motion.div>
             </div>
 
             <div className="container-wide relative z-10">
-              <LayoutGroup>
-                <motion.div 
-                  layout
-                  className="columns-1 sm:columns-2 lg:columns-3"
-                  style={{ columnGap: '2rem' }}
-                  transition={{ layout: { duration: 0.6, ease: [0.19, 1, 0.22, 1] } }}
+              {hasGenerations ? (
+                <LayoutGroup>
+                  <motion.div 
+                    layout
+                    className="columns-1 sm:columns-2 lg:columns-3"
+                    style={{ columnGap: '2rem' }}
+                    transition={{ layout: { duration: 0.6, ease: [0.19, 1, 0.22, 1] } }}
+                  >
+                    {Array.from({ length: 16 }).map((_, index) => (
+                      <FeedItem
+                        key={index}
+                        index={index}
+                        isInView={isInView}
+                        feedImage={feedImage}
+                        feedImage2={feedImage2}
+                        feedVideo2={feedVideo2}
+                      />
+                    ))}
+                  </motion.div>
+                </LayoutGroup>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={isInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                  className="flex items-center justify-center min-h-[60vh] py-16"
                 >
-                  {Array.from({ length: 16 }).map((_, index) => (
-                    <FeedItem
-                      key={index}
-                      index={index}
-                      isInView={isInView}
-                      feedImage={feedImage}
-                      feedImage2={feedImage2}
-                      feedVideo2={feedVideo2}
-                    />
-                  ))}
+                  <div className="max-w-2xl w-full text-center">
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={isInView ? { opacity: 1, scale: 1 } : {}}
+                      transition={{ duration: 0.6, delay: 0.4 }}
+                      className="bg-card border border-border p-8 md:p-12 rounded-lg"
+                    >
+                      <h2 className="text-2xl md:text-3xl font-sans font-bold mb-4 text-foreground">
+                        Your closet is empty
+                      </h2>
+                      <p className="text-muted-foreground mb-8 text-sm md:text-base leading-relaxed">
+                        Start building your V-TRY closet by uploading images or browsing your favorite e-commerce websites and clicking on V-TRY banners to create your first generation.
+                      </p>
+                      
+                      <div className="flex flex-col gap-6">
+                        <motion.button
+                          onClick={() => setIsUploadModalOpen(true)}
+                          className="w-full px-6 py-3 rounded-lg font-mono uppercase tracking-wider text-sm font-semibold bg-accent text-accent-foreground hover:bg-accent/90 transition-colors flex items-center justify-center gap-2"
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <Upload className="w-4 h-4" />
+                          Upload or Import
+                        </motion.button>
+                        
+                        <div className="text-center">
+                          <p className="text-xs font-mono text-muted-foreground mb-3 uppercase tracking-wider">
+                            Or browse popular websites
+                          </p>
+                          <div className="flex flex-wrap gap-2 justify-center">
+                            {selectedSites.map((site, index) => (
+                              <motion.a
+                                key={site.name}
+                                href={addVTryReferral(site.url)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                                transition={{ delay: 0.5 + index * 0.1 }}
+                                className="px-4 py-2 rounded-lg font-mono text-xs uppercase tracking-wider border border-border hover:border-accent hover:bg-accent/5 transition-colors text-foreground"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                              >
+                                {site.name}
+                              </motion.a>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </div>
                 </motion.div>
-              </LayoutGroup>
+              )}
             </div>
           </section>
         </main>
         
         <Footer />
       </motion.div>
+
+      {/* Upload Modal */}
+      <Dialog open={isUploadModalOpen} onOpenChange={(open) => {
+        if (!open) {
+          handleCloseModal();
+        } else {
+          setIsUploadModalOpen(true);
+        }
+      }}>
+        <DialogContent 
+          className="fixed inset-0 z-50 w-full h-full max-w-none max-h-none m-0 p-0 border-0 rounded-none [&>button]:hidden"
+          onEscapeKeyDown={handleCloseModal}
+          onInteractOutside={(e) => {
+            e.preventDefault();
+            handleCloseModal();
+          }}
+          onPointerDownOutside={(e) => {
+            e.preventDefault();
+            handleCloseModal();
+          }}
+        >
+          {/* Wrapper to catch background clicks */}
+          <div 
+            className="fixed inset-0"
+            onClick={(e) => {
+              // Close if clicking the wrapper itself
+              if (e.target === e.currentTarget) {
+                handleCloseModal();
+              }
+            }}
+          >
+            {/* Content container */}
+            <div 
+              className="relative w-full h-full flex flex-col bg-background/95 backdrop-blur-sm"
+              onClick={(e) => e.stopPropagation()}
+            >
+            {/* Close Button */}
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 }}
+              onClick={handleCloseModal}
+              className="absolute top-8 right-8 z-50 w-12 h-12 flex items-center justify-center rounded-full bg-background/80 backdrop-blur-sm border border-border hover:bg-accent/10 hover:border-accent transition-all duration-300 group"
+            >
+              <X className="w-5 h-5 text-foreground/70 group-hover:text-accent transition-colors" strokeWidth={2} />
+            </motion.button>
+
+            {/* Content */}
+            <div 
+              className="flex-1 flex items-center justify-center p-8 md:p-16 upload-content-area"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div 
+                className="w-full max-w-4xl upload-content-area"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* URL Import Field */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.1 }}
+                  className="mb-6"
+                >
+                  <div className="flex items-center gap-3 border border-border bg-card p-4 rounded-lg">
+                    <input
+                      type="url"
+                      value={imageUrl}
+                      onChange={(e) => setImageUrl(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handleImportFromUrl();
+                        }
+                      }}
+                      placeholder="Paste image URL here"
+                      className="flex-1 bg-transparent border-none outline-none text-sm font-mono text-foreground placeholder:text-muted-foreground/50"
+                      disabled={isLoadingUrl}
+                    />
+                    <motion.button
+                      onClick={handleImportFromUrl}
+                      disabled={!imageUrl.trim() || isLoadingUrl}
+                      className="px-6 py-2 text-sm font-mono uppercase tracking-wider bg-accent text-accent-foreground hover:bg-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                      whileHover={{ scale: isLoadingUrl || !imageUrl.trim() ? 1 : 1.05 }}
+                      whileTap={{ scale: isLoadingUrl || !imageUrl.trim() ? 1 : 0.95 }}
+                    >
+                      {isLoadingUrl ? 'Loading...' : 'Import'}
+                    </motion.button>
+                  </div>
+                </motion.div>
+
+                {/* Divider */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 0.15 }}
+                  className="flex items-center gap-4 mb-6"
+                >
+                  <div className="flex-1 h-px bg-border" />
+                  <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">OR</span>
+                  <div className="flex-1 h-px bg-border" />
+                </motion.div>
+
+                {/* Upload Area */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  className="relative"
+                >
+                  <div
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    className={`
+                      relative border-2 border-dashed rounded-lg transition-all duration-300
+                      ${isDragging 
+                        ? 'border-accent bg-accent/5 scale-[1.02]' 
+                        : 'border-border hover:border-accent/50'
+                      }
+                      ${previewUrl ? 'border-solid bg-card' : 'bg-secondary/30'}
+                    `}
+                  >
+                    {previewUrl ? (
+                      <div className="relative p-8 md:p-12">
+                        <div className="relative aspect-[9/16] max-w-md mx-auto overflow-hidden rounded-lg border border-border bg-secondary">
+                          <img
+                            src={previewUrl}
+                            alt="Preview"
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
+                        </div>
+                        <div className="mt-6 text-center">
+                          <p className="text-sm font-mono text-foreground mb-2">
+                            {selectedFile?.name}
+                          </p>
+                          <p className="text-xs text-muted-foreground mb-6">
+                            {(selectedFile?.size ? selectedFile.size / 1024 / 1024 : 0).toFixed(2)} MB
+                          </p>
+                          <div className="flex items-center justify-center gap-4">
+                            <motion.button
+                              onClick={() => {
+                                setSelectedFile(null);
+                                if (previewUrl) {
+                                  URL.revokeObjectURL(previewUrl);
+                                  setPreviewUrl(null);
+                                }
+                                if (fileInputRef.current) {
+                                  fileInputRef.current.value = '';
+                                }
+                              }}
+                              className="px-6 py-2.5 text-sm font-mono uppercase tracking-wider border border-border hover:bg-muted transition-colors"
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                            >
+                              Remove
+                            </motion.button>
+                            <motion.button
+                              onClick={handleUpload}
+                              className="px-6 py-2.5 text-sm font-mono uppercase tracking-wider bg-accent text-accent-foreground hover:bg-accent/90 transition-colors"
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                            >
+                              Upload to V-TRY
+                            </motion.button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-12 md:p-16">
+                        <div className="flex flex-col items-center justify-center text-center">
+                          <motion.div
+                            animate={isDragging ? { scale: 1.1, rotate: 5 } : { scale: 1, rotate: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="mb-6"
+                          >
+                            <div className="w-20 h-20 rounded-full bg-accent/10 border-2 border-accent/30 flex items-center justify-center">
+                              <ImageIcon className="w-10 h-10 text-accent" strokeWidth={1.5} />
+                            </div>
+                          </motion.div>
+                          
+                          <h3 className="text-xl font-sans font-bold mb-2">
+                            {isDragging ? 'Drop your image here' : 'Drag & drop your image'}
+                          </h3>
+                          <p className="text-sm text-muted-foreground mb-8 font-mono">
+                            or click to browse
+                          </p>
+
+                          <motion.button
+                            onClick={() => fileInputRef.current?.click()}
+                            className="px-8 py-3 text-sm font-mono uppercase tracking-wider bg-accent text-accent-foreground hover:bg-accent/90 transition-colors"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            Select File
+                          </motion.button>
+
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileInputChange}
+                            className="hidden"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+
+                {/* Decorative elements */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-accent/30"
+                />
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-accent/30"
+                />
+              </div>
+            </div>
+          </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
