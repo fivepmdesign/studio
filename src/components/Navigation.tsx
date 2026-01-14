@@ -26,13 +26,27 @@ const PLAN_CONFIG = {
 // Current plan - switch between 'free', 'pro', 'ultra'
 const CURRENT_PLAN = 'free';
 
-const navLinks = [
+// Base navigation links
+const baseNavLinks = [
   { name: 'Pricing', href: '/pricing', number: '01' },
   { name: 'Download', href: '/download', number: '02' },
   { name: 'Feed', href: '/feed', number: '03' },
   { name: 'Onboarding', href: '/onboarding', number: '04' },
   { name: 'Account', href: '/account', number: '05' },
 ];
+
+// Add Upgrade link for free and pro plans only
+const getNavLinks = () => {
+  if (CURRENT_PLAN === 'free' || CURRENT_PLAN === 'pro') {
+    return [
+      ...baseNavLinks,
+      { name: 'Upgrade', href: '/upgrade', number: '06' },
+    ];
+  }
+  return baseNavLinks;
+};
+
+const navLinks = getNavLinks();
 
 export const Navigation = () => {
   const navRef = useRef<HTMLElement | null>(null);
@@ -43,7 +57,7 @@ export const Navigation = () => {
   const location = useLocation();
   
   // Mock user data - replace with actual user data from auth
-  const userCredits = 49;
+  const userCredits = 10;
   // In production, get this from your auth system (e.g., user?.imageUrl, user?.photo, etc.)
   // For demo purposes, set to exampleUserPhoto to show the photo feature
   // Set to null to show the placeholder icon
@@ -448,6 +462,58 @@ export const Navigation = () => {
                   </motion.div>
                 ))}
               </div>
+              
+              {/* Credits and User Pills - Mobile */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+                className="mt-12 flex items-center gap-3 justify-start"
+              >
+                {/* User Photo Circle Button - Clickable to Account */}
+                <Link
+                  to="/account"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="relative w-[42px] h-[42px] rounded-full bg-accent/20 border-2 border-accent/30 flex items-center justify-center overflow-hidden flex-shrink-0 hover:border-accent hover:bg-accent/30 transition-all duration-300"
+                >
+                  {hasUserPhoto ? (
+                    <img 
+                      src={userPhoto} 
+                      alt="User" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-5 h-5 text-accent" strokeWidth={2} />
+                  )}
+                </Link>
+                
+                {/* Credits Button */}
+                <button
+                  onClick={() => {
+                    setIsTopUpModalOpen(true);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`group relative px-6 py-3 border rounded-full bg-background/80 backdrop-blur-sm transition-all duration-300 flex items-center gap-1.5 ${
+                    isLowCredits 
+                      ? 'border-red-500/50 bg-red-500/10 hover:bg-red-500/20 hover:border-red-500' 
+                      : 'border-border hover:bg-accent/10 hover:border-accent'
+                  }`}
+                >
+                  <span className={`text-sm font-mono font-semibold transition-colors ${
+                    isLowCredits 
+                      ? 'text-red-600 dark:text-red-500 group-hover:text-red-600 dark:group-hover:text-red-500' 
+                      : 'text-foreground group-hover:text-accent'
+                  }`}>
+                    {userCredits.toLocaleString()}
+                  </span>
+                  {isLowCredits && (
+                    <span className="text-xs font-mono text-red-600 dark:text-red-500">
+                      remaining
+                    </span>
+                  )}
+                </button>
+              </motion.div>
               
               {/* Bottom section */}
               <motion.div

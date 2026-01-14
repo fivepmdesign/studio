@@ -1,10 +1,12 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { AnimatedLine } from '@/components/AnimatedText';
 import { Palette, Code, Megaphone, Lightbulb, BarChart3, Globe, User, LogOut } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import AddPersonaModal from '@/components/AddPersonaModal';
 import personaPhoto from '@/assets/photo.png';
 import exampleUserPhoto from '@/assets/photo.png';
 import frontView from '@/assets/Front view 1.png';
@@ -32,48 +34,55 @@ const PLAN_CONFIG = {
 };
 
 // Current plan - switch between 'free', 'pro', 'ultra'
-const CURRENT_PLAN = 'free';
+const CURRENT_PLAN = 'ultra';
 
 const services = [
   {
     pill: 'SUBSCRIPTION',
     title: CURRENT_PLAN === 'free' ? 'Free plan' : PLAN_CONFIG[CURRENT_PLAN as keyof typeof PLAN_CONFIG].name,
-    subtitle: CURRENT_PLAN === 'free' ? 'No renewal' : `Your plan renews on ${PLAN_CONFIG[CURRENT_PLAN as keyof typeof PLAN_CONFIG].renewsOn}`,
+    subtitle: CURRENT_PLAN === 'free' ? 'Try V-TRY for free' : `Your plan renews on ${PLAN_CONFIG[CURRENT_PLAN as keyof typeof PLAN_CONFIG].renewsOn}`,
     number: '01',
     width: '1/3',
-    cta: 'Manage plan',
+    cta: CURRENT_PLAN === 'free' ? 'UPGRADE PLAN' : 'Manage plan',
+    ctaLink: '/upgrade',
   },
   {
     pill: 'CREDITS',
-    title: '49',
+    title: '10',
     titleSuffix: `/${PLAN_CONFIG[CURRENT_PLAN as keyof typeof PLAN_CONFIG].creditsTotal}`,
-    subtitle: 'Resets in 19 days',
+    subtitle: CURRENT_PLAN === 'free' 
+      ? 'Credits don\'t reset monthly.\nUpgrade to a paid plan to get monthly credits.' 
+      : 'Resets in 19 days',
     number: '02',
     width: '2/3',
-    cta: 'BUY CREDITS',
-    creditsUsed: 49,
+    cta: 'ADD MORE CREDITS',
+    ctaLink: CURRENT_PLAN === 'free' ? '/upgrade' : undefined,
+    upgradeCta: CURRENT_PLAN === 'free' ? 'UPGRADE PLAN' : undefined,
+    creditsUsed: 10,
     creditsTotal: PLAN_CONFIG[CURRENT_PLAN as keyof typeof PLAN_CONFIG].creditsTotal,
   },
   {
     pill: 'UPCOMING INVOICES',
     title: 'Upcoming Invoices',
-    subtitle: 'Review and manage your upcoming billing statements.',
+    subtitle: CURRENT_PLAN === 'free' ? 'No invoices available on free plan.' : 'Review and manage your upcoming billing statements.',
     number: '03',
     width: '1/2',
-    cta: 'View all Invoices',
+    cta: CURRENT_PLAN === 'free' ? 'UPGRADE PLAN' : 'View all Invoices',
+    ctaLink: CURRENT_PLAN === 'free' ? '/upgrade' : undefined,
   },
   {
     pill: 'PAYMENT METHODS',
     title: 'Payment Methods',
-    subtitle: 'Credit card - Stripe',
+    subtitle: CURRENT_PLAN === 'free' ? 'No payment methods on file' : 'Credit card - Stripe',
     number: '04',
     width: '1/2',
-    cta: 'Manage billing information',
+    cta: CURRENT_PLAN === 'free' ? 'UPGRADE PLAN' : 'Manage billing information',
+    ctaLink: CURRENT_PLAN === 'free' ? '/upgrade' : undefined,
   },
 ];
 
 interface ServiceCardProps {
-  service: typeof services[0];
+  service: typeof services[0] & { ctaLink?: string; upgradeCta?: string };
   index: number;
   activeIndex: number | null;
   setActiveIndex: (index: number | null) => void;
@@ -100,7 +109,8 @@ const ServiceCard = ({ service, index, activeIndex, setActiveIndex, isLowCredits
       }`}>
         {/* Credit Consumption Gradient (only for credits card) - Shows consumption percentage */}
         {service.creditsUsed !== undefined && service.creditsTotal !== undefined && (() => {
-          // Calculate consumed credits and percentage dynamically
+          // Dynamically calculate consumed credits and percentage for all plans
+          // This calculation works for free (90), pro (320), and ultra (750) plans
           const creditsRemaining = service.creditsUsed; // Note: creditsUsed actually represents remaining credits
           const creditsConsumed = service.creditsTotal - creditsRemaining;
           const consumptionPercentage = (creditsConsumed / service.creditsTotal) * 100;
@@ -156,21 +166,31 @@ const ServiceCard = ({ service, index, activeIndex, setActiveIndex, isLowCredits
           className="font-sans font-bold text-xl md:text-2xl mb-2 transition-colors duration-300 flex items-baseline gap-1 relative z-10"
           animate={{ x: isActive ? 5 : 0 }}
         >
-          {service.title}
-          {service.titleSuffix && (
-            <span className="text-lg md:text-xl text-accent">
-              {service.titleSuffix}
-            </span>
+          {service.creditsUsed !== undefined && isLowCredits ? (
+            <>
+              <span className="text-red-600 dark:text-red-500">
+                {service.creditsUsed} remaining
+              </span>
+              {service.titleSuffix && (
+                <span className={`text-lg md:text-xl ${isLowCredits ? 'text-red-600 dark:text-red-500' : 'text-accent'}`}>
+                  {service.titleSuffix}
+                </span>
+              )}
+            </>
+          ) : (
+            <>
+              {service.title}
+              {service.titleSuffix && (
+                <span className="text-lg md:text-xl text-accent">
+                  {service.titleSuffix}
+                </span>
+              )}
+            </>
           )}
         </motion.h3>
         {service.subtitle && (
-          <p className="text-sm text-muted-foreground mb-3 relative z-10">
+          <p className="text-sm text-muted-foreground mb-3 relative z-10 whitespace-pre-line">
             {service.subtitle}
-          </p>
-        )}
-        {isLowCredits && service.creditsUsed !== undefined && (
-          <p className="text-sm font-mono text-red-600 dark:text-red-500 mb-3 relative z-10 font-semibold">
-            {service.creditsUsed} credits remaining
           </p>
         )}
         {service.description && (
@@ -195,40 +215,72 @@ const ServiceCard = ({ service, index, activeIndex, setActiveIndex, isLowCredits
           transition={{ duration: 0.3 }}
         />
 
-        {/* CTA Button and Arrow */}
+        {/* CTA Buttons and Arrow */}
         <div className="absolute bottom-4 right-4 flex items-center gap-3">
-          {service.cta && (
-            <motion.button
+          {service.upgradeCta && (
+            <motion.div
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: isActive ? 1 : 0, x: isActive ? 0 : -10 }}
               transition={{ duration: 0.3 }}
-              className="text-xs font-bold uppercase tracking-widest text-foreground/70 hover:text-accent transition-colors"
+              className="flex items-center gap-3"
             >
-              {service.cta}
-            </motion.button>
+              <Link
+                to={service.ctaLink || '#'}
+                className="text-xs font-bold uppercase tracking-widest text-foreground/70 hover:text-accent transition-colors"
+              >
+                {service.upgradeCta}
+              </Link>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-accent">
+                <path
+                  d="M7 17L17 7M17 7H7M17 7V17"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </motion.div>
           )}
-          <motion.div
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: isActive ? 1 : 0, x: isActive ? 0 : -10 }}
-            transition={{ duration: 0.3 }}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-accent">
-              <path
-                d="M7 17L17 7M17 7H7M17 7V17"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </motion.div>
+          {service.cta && (
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: isActive ? 1 : 0, x: isActive ? 0 : -10 }}
+              transition={{ duration: 0.3 }}
+              className="flex items-center gap-3"
+            >
+              {service.ctaLink && !service.upgradeCta ? (
+                <Link
+                  to={service.ctaLink}
+                  className="text-xs font-bold uppercase tracking-widest text-foreground/70 hover:text-accent transition-colors"
+                >
+                  {service.cta}
+                </Link>
+              ) : (
+                <button
+                  className="text-xs font-bold uppercase tracking-widest text-foreground/70 hover:text-accent transition-colors"
+                >
+                  {service.cta}
+                </button>
+              )}
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-accent">
+                <path
+                  d="M7 17L17 7M17 7H7M17 7V17"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </motion.div>
+          )}
         </div>
       </div>
     </motion.div>
   );
 };
 
-const personas = [
+// Filter personas based on plan - free plan allows only 1 persona
+const allPersonas = [
   {
     id: 1,
     name: 'Persona 1',
@@ -267,6 +319,9 @@ const personas = [
   },
 ];
 
+// Show only 1 persona for free plan, all for paid plans
+const personas = CURRENT_PLAN === 'free' ? allPersonas.slice(0, 1) : allPersonas;
+
 const Account = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
@@ -278,6 +333,7 @@ const Account = () => {
     2: 'Persona 2',
     3: 'Persona 3',
   });
+  const [isAddPersonaModalOpen, setIsAddPersonaModalOpen] = useState(false);
   
   // Mock user data - replace with actual user data from auth
   // In production, get this from your auth system (e.g., user?.imageUrl, user?.photo, etc.)
@@ -412,9 +468,9 @@ const Account = () => {
                 {/* Counter Circles */}
                 <div className="flex flex-col md:flex-row gap-4 md:gap-6 flex-shrink-0">
                   {[
-                    { number: '1,247', suffix: '', label: 'Images' },
-                    { number: '342', suffix: '', label: 'Videos' },
-                    { number: '89', suffix: '', label: 'Websites' },
+                    { number: '30', suffix: '', label: 'Images' },
+                    { number: '1', suffix: '', label: 'Videos' },
+                    { number: '6', suffix: '', label: 'Websites' },
                   ].map((stat, index) => (
                     <motion.div
                       key={stat.label}
@@ -632,14 +688,20 @@ const Account = () => {
                   {/* Add New Persona Card */}
                   <motion.button
                     onClick={() => {
-                      // Handle add new persona
-                      console.log('Add new persona');
+                      if (CURRENT_PLAN === 'free') {
+                        // Navigate to upgrade page for free plan users
+                        window.location.href = '/upgrade';
+                      } else {
+                        // Open add persona modal for paid plans
+                        setIsAddPersonaModalOpen(true);
+                      }
                     }}
                     initial={{ opacity: 0, y: 20 }}
                     animate={isInView ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.4, delay: 0.5 + personas.length * 0.1 }}
-                    className="relative p-6 border border-dashed border-border/50 hover:border-border transition-all duration-300 text-left bg-background/10 hover:bg-background/20"
+                    className="group relative p-6 border border-dashed border-border/50 hover:border-border transition-all duration-300 text-left bg-background/10 hover:bg-background/20"
                   >
+
                     {/* Skeleton UI */}
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-border bg-secondary/50 flex items-center justify-center">
@@ -666,11 +728,22 @@ const Account = () => {
                         ))}
                       </div>
 
-                      {/* Add Text */}
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-background/80">
-                        <span className="text-sm font-bold uppercase tracking-widest text-foreground">
-                          Add New Persona
+                      {/* Add Text with Credit Cost */}
+                      <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-background/80">
+                        <span className="text-sm font-bold uppercase tracking-widest text-foreground mb-2">
+                          {CURRENT_PLAN === 'free' 
+                            ? 'Upgrade to add more personas' 
+                            : 'Add New Persona'}
                         </span>
+                        {/* Credit Cost Bubble - appears on hover */}
+                        <motion.div
+                          initial={{ opacity: 0, y: 5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.1 }}
+                          className="px-3 py-1.5 bg-background/95 backdrop-blur-sm border border-border rounded-full text-xs font-medium text-foreground flex items-center gap-2"
+                        >
+                          <span>25 Credits</span>
+                        </motion.div>
                       </div>
                     </motion.button>
                 </div>
@@ -681,6 +754,12 @@ const Account = () => {
       </main>
       
       <Footer />
+      
+      {/* Add Persona Modal */}
+      <AddPersonaModal 
+        isOpen={isAddPersonaModalOpen} 
+        onClose={() => setIsAddPersonaModalOpen(false)} 
+      />
     </div>
   );
 };

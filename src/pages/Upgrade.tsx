@@ -8,9 +8,38 @@ import MagneticButton from '@/components/MagneticButton';
 import Navigation from '@/components/Navigation';
 import CTASection from '@/components/sections/CTASection';
 
-const services = [
+// Plan configuration - should match Account page
+const PLAN_CONFIG = {
+  free: {
+    name: 'Free plan',
+    creditsTotal: 90,
+  },
+  pro: {
+    name: 'Pro plan',
+    creditsTotal: 320,
+  },
+  ultra: {
+    name: 'Ultra plan',
+    creditsTotal: 750,
+  },
+};
+
+// Current plan - backend format: 'free', 'pro-monthly', 'pro-yearly', 'ultra-monthly', 'ultra-yearly'
+type PlanType = 'free' | 'pro-monthly' | 'pro-yearly' | 'ultra-monthly' | 'ultra-yearly';
+const CURRENT_PLAN: PlanType = 'free';
+
+// Helper to extract plan tier and billing period
+const getPlanInfo = (plan: PlanType) => {
+  if (plan === 'free') return { tier: 'free', billing: null };
+  const [tier, billing] = plan.split('-') as ['pro' | 'ultra', 'monthly' | 'yearly'];
+  return { tier, billing };
+};
+
+const currentPlanInfo = getPlanInfo(CURRENT_PLAN);
+
+const allServices = [
   {
-    id: 'brand-identity',
+    id: 'free',
     title: 'Free Plan',
     tagline: 'Try V-TRY and see how it works without commitment',
     description: 'Try it once for free. When your free generations are used, upgrade to keep generating',
@@ -21,12 +50,14 @@ const services = [
       { label: 'How do I look', value: '10 generations' },
     ],
     startingPrice: '$0 - No credit card required',
+    monthlyPrice: '$0',
+    yearlyPrice: '$0',
     timeline: '4-6 weeks',
     popular: false,
     number: '01',
   },
   {
-    id: 'web-design',
+    id: 'pro',
     title: 'Pro Plan',
     tagline: 'Great for regular use. Get a set of credits monthly',
     description: 'Great for regular use. Get a set of credits monthly',
@@ -37,12 +68,14 @@ const services = [
       { label: 'How do I look', value: '128 generations/mo' },
     ],
     startingPrice: '$24.99/month',
+    monthlyPrice: '$24.99/mo',
+    yearlyPrice: '$240/year',
     timeline: '6-10 weeks',
     popular: true,
     number: '02',
   },
   {
-    id: 'digital-campaign',
+    id: 'ultra',
     title: 'Ultra Plan',
     tagline: 'For creators and power users who want more room to explore',
     description: 'For creators and power users who want more room to explore',
@@ -53,11 +86,19 @@ const services = [
       { label: 'How do I look', value: '300 generations/mo' },
     ],
     startingPrice: '$49.99/month',
+    monthlyPrice: '$49.99/mo',
+    yearlyPrice: '$480/year',
     timeline: '3-5 weeks',
     popular: false,
     number: '03',
   },
 ];
+
+// Filter services based on current plan - hide Free plan for Pro and Ultra users
+const isFreePlan = (CURRENT_PLAN as string) === 'free';
+const baseServices = isFreePlan 
+  ? allServices 
+  : allServices.filter(service => service.id !== 'free');
 
 const addOns = [
   { name: '60 V-TRY Credits', price: '5.00', number: '01' },
@@ -67,16 +108,23 @@ const addOns = [
 ];
 
 const Upgrade = () => {
-  const categories = ['MONTHLY', 'YEARLY'];
+  const categories: ('MONTHLY' | 'YEARLY')[] = ['MONTHLY', 'YEARLY'];
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [activeService, setActiveService] = useState<number | null>(null);
-  const [activeCategory, setActiveCategory] = useState('MONTHLY');
+  // Set initial category based on current plan billing period, or default to MONTHLY
+  const [activeCategory, setActiveCategory] = useState<'MONTHLY' | 'YEARLY'>(
+    currentPlanInfo.billing === 'yearly' ? 'YEARLY' : 'MONTHLY'
+  );
   const [searchQuery, setSearchQuery] = useState('');
   const servicesRef = useRef(null);
   const addOnsRef = useRef(null);
 
   const servicesInView = useInView(servicesRef, { once: true, margin: '-100px' });
   const addOnsInView = useInView(addOnsRef, { once: true, margin: '-100px' });
+
+  // Filter services based on active category tab
+  // For free plan users, show all plans. For paid users, show both Pro and Ultra
+  const services = baseServices;
 
   const handleMouseMove = (e: React.MouseEvent) => {
     setMousePosition({
@@ -111,9 +159,6 @@ const Upgrade = () => {
                 <div className="h-px w-12 bg-accent" />
                 <span className="text-sm font-mono text-muted-foreground tracking-wider">UPGRADE</span>
               </div>
-              <h2 className="text-4xl md:text-6xl font-sans font-bold leading-tight max-w-3xl">
-                AI try-ons, priced to scale
-              </h2>
             </motion.div>
 
             {/* Filter Component */}
@@ -128,7 +173,7 @@ const Upgrade = () => {
                   {categories.map((category) => (
                     <button
                       key={category}
-                      onClick={() => setActiveCategory(category)}
+                      onClick={() => setActiveCategory(category as 'MONTHLY' | 'YEARLY')}
                       className={`group relative h-16 px-8 flex items-center justify-center gap-2 text-sm font-mono uppercase tracking-wider transition-all hover:bg-accent hover:text-accent-foreground whitespace-nowrap border-r border-border last:border-r-0 ${
                         activeCategory === category 
                           ? 'bg-accent text-accent-foreground' 
@@ -150,7 +195,7 @@ const Upgrade = () => {
             </motion.div>
 
             {/* Interactive Grid */}
-            <div className="grid md:grid-cols-3 border-t border-l border-border">
+            <div className={`grid ${services.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'} border-t border-l border-border`}>
               {services.map((service, index) => (
                 <motion.div
                   key={service.id}
@@ -178,15 +223,29 @@ const Upgrade = () => {
                       <h3 className="text-4xl md:text-5xl lg:text-6xl font-sans font-bold leading-[0.9] group-hover:text-accent transition-colors duration-500">
                         {service.title}
                       </h3>
-                      <p className="text-sm font-mono tracking-wider text-muted-foreground uppercase">
-                        {activeCategory === 'YEARLY' 
-                          ? service.title === 'Pro Plan' 
-                            ? '$240/year'
-                            : service.title === 'Ultra Plan'
-                            ? '$480/year'
-                            : service.startingPrice
-                          : service.startingPrice}
-                      </p>
+                      <div className="flex items-center gap-3">
+                        <p className="text-sm font-mono tracking-wider text-muted-foreground uppercase">
+                          {activeCategory === 'YEARLY' 
+                            ? (service as typeof allServices[0]).yearlyPrice || service.startingPrice
+                            : (service as typeof allServices[0]).monthlyPrice || service.startingPrice}
+                        </p>
+                        {/* Show "This is your plan" subtitle for current plan */}
+                        {(() => {
+                          const isCurrentPlan = 
+                            (service.id === 'free' && currentPlanInfo.tier === 'free') ||
+                            service.id === 'pro' && currentPlanInfo.tier === 'pro' && 
+                            ((activeCategory === 'MONTHLY' && currentPlanInfo.billing === 'monthly') ||
+                             (activeCategory === 'YEARLY' && currentPlanInfo.billing === 'yearly')) ||
+                            service.id === 'ultra' && currentPlanInfo.tier === 'ultra' && 
+                            ((activeCategory === 'MONTHLY' && currentPlanInfo.billing === 'monthly') ||
+                             (activeCategory === 'YEARLY' && currentPlanInfo.billing === 'yearly'));
+                          return isCurrentPlan ? (
+                            <p className="text-xs font-mono tracking-wider text-accent uppercase">
+                              This is your plan
+                            </p>
+                          ) : null;
+                        })()}
+                      </div>
                     </div>
                   </div>
 
@@ -219,24 +278,76 @@ const Upgrade = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-end justify-end pt-6">
-                      <Link 
-                        to="/login" 
-                        className="text-sm font-bold uppercase tracking-widest hover:text-accent transition-colors"
-                      >
-                        {service.title === 'Free Plan' 
-                          ? 'Get started free →'
-                          : service.title === 'Pro Plan'
-                          ? activeCategory === 'YEARLY'
-                            ? 'Get started for $240/year →'
-                            : 'Get started for $24.99/mo →'
-                          : service.title === 'Ultra Plan'
-                          ? activeCategory === 'YEARLY'
-                            ? 'Get started for $480/year →'
-                            : 'Get started for $49.99/mo →'
-                          : 'Get started →'}
-                      </Link>
-                    </div>
+                    {(() => {
+                      // Check if this is the current plan (same tier and billing period)
+                      const isCurrentPlan = 
+                        (service.id === 'free' && currentPlanInfo.tier === 'free') ||
+                        service.id === 'pro' && currentPlanInfo.tier === 'pro' && 
+                        ((activeCategory === 'MONTHLY' && currentPlanInfo.billing === 'monthly') ||
+                         (activeCategory === 'YEARLY' && currentPlanInfo.billing === 'yearly')) ||
+                        service.id === 'ultra' && currentPlanInfo.tier === 'ultra' && 
+                        ((activeCategory === 'MONTHLY' && currentPlanInfo.billing === 'monthly') ||
+                         (activeCategory === 'YEARLY' && currentPlanInfo.billing === 'yearly'));
+                      
+                      // Don't show button if this is the current plan
+                      if (isCurrentPlan) {
+                        return null;
+                      }
+                      
+                      return (
+                        <div className="flex items-end justify-end pt-6">
+                          <Link 
+                            to="/login" 
+                            className="text-sm font-bold uppercase tracking-widest hover:text-accent transition-colors"
+                          >
+                            {(() => {
+                              // For free plan users
+                              if (isFreePlan) {
+                                if (service.id === 'pro') {
+                                  return activeCategory === 'YEARLY'
+                                    ? 'Upgrade for $240/year →'
+                                    : 'Upgrade for $24.99/mo →';
+                                }
+                                if (service.id === 'ultra') {
+                                  return activeCategory === 'YEARLY'
+                                    ? 'Upgrade for $480/year →'
+                                    : 'Upgrade for $49.99/mo →';
+                                }
+                              }
+                              
+                              // For paid plan users - show upgrade options
+                              if (service.id === 'pro') {
+                                // If user is on ultra plan, show downgrade option
+                                if (currentPlanInfo.tier === 'ultra') {
+                                  return activeCategory === 'YEARLY'
+                                    ? 'Downgrade for $240/year →'
+                                    : 'Downgrade for $24.99/mo →';
+                                }
+                                // If user is on pro-monthly, show upgrade to pro-yearly option
+                                if (currentPlanInfo.tier === 'pro' && currentPlanInfo.billing === 'monthly' && activeCategory === 'YEARLY') {
+                                  return 'Upgrade to yearly for $240/year →';
+                                }
+                                return activeCategory === 'YEARLY'
+                                  ? 'Upgrade for $240/year →'
+                                  : 'Upgrade for $24.99/mo →';
+                              }
+                              
+                              if (service.id === 'ultra') {
+                                // If user is on ultra-monthly, show upgrade to ultra-yearly option
+                                if (currentPlanInfo.tier === 'ultra' && currentPlanInfo.billing === 'monthly' && activeCategory === 'YEARLY') {
+                                  return 'Upgrade to yearly for $480/year →';
+                                }
+                                return activeCategory === 'YEARLY'
+                                  ? 'Upgrade for $480/year →'
+                                  : 'Upgrade for $49.99/mo →';
+                              }
+                              
+                              return 'Get started →';
+                            })()}
+                          </Link>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </motion.div>
               ))}
@@ -244,61 +355,6 @@ const Upgrade = () => {
           </div>
         </section>
 
-        {/* Add-ons Section */}
-        <section ref={addOnsRef} className="py-24 md:py-32 relative overflow-hidden">
-          <div className="container-wide">
-            {/* Centered Header */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={addOnsInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8 }}
-              className="text-center mb-24"
-            >
-              <div className="flex items-center justify-center gap-4 mb-6">
-                <span className="text-sm font-mono text-accent">V-TRY</span>
-                <div className="h-px w-12 bg-accent" />
-                <span className="text-sm font-mono text-muted-foreground tracking-wider">CREDITS TOP-UP</span>
-              </div>
-              
-              <h2 className="text-3xl md:text-5xl font-sans font-bold max-w-2xl mx-auto">
-                Credits can be used anytime and never expire
-              </h2>
-            </motion.div>
-
-            {/* Typographic Ledger List */}
-            <div className="max-w-6xl mx-auto border-t border-border">
-              {addOns.map((addon, index) => (
-                <motion.div
-                  key={addon.name}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={addOnsInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
-                  className="group relative flex flex-col md:flex-row md:items-baseline justify-between py-12 md:py-16 border-b border-border cursor-pointer"
-                >
-                  <div className="flex items-baseline gap-8 md:gap-16">
-                    <span className="font-mono text-sm text-accent/50 group-hover:text-accent transition-colors duration-300">
-                      {addon.number}
-                    </span>
-                    <h3 className="text-3xl md:text-6xl font-sans font-bold text-foreground group-hover:text-accent group-hover:translate-x-4 transition-all duration-500 ease-out">
-                      {addon.name}
-                    </h3>
-                  </div>
-
-                  <div className="flex items-center justify-between md:justify-end gap-8 mt-6 md:mt-0 pl-[calc(2rem+1px)] md:pl-0">
-                    <p className="font-mono text-lg md:text-xl text-muted-foreground group-hover:text-foreground transition-colors duration-300">
-                      ${addon.price}
-                    </p>
-                    <div className="w-12 h-12 rounded-full border border-border flex items-center justify-center opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500">
-                      <span className="text-accent text-2xl">+</span>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <CTASection />
 
         <Footer />
       </div>

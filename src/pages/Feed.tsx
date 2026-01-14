@@ -2,7 +2,6 @@ import { motion, useInView, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { useRef, useState, useMemo, useEffect } from 'react';
 import { Search, Eye, Play, ShoppingCart, Trash2, Loader2, Upload, X, Image as ImageIcon } from 'lucide-react';
 import Navigation from '@/components/Navigation';
-import CustomCursor from '@/components/CustomCursor';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
@@ -530,15 +529,6 @@ const Feed = () => {
         url="https://studio.design/feed"
       />
 
-      <CustomCursor />
-      
-      {/* Override custom cursor for feed images */}
-      <style>{`
-        [data-feed-image] img,
-        [data-feed-image] video {
-          cursor: default !important;
-        }
-      `}</style>
 
       <motion.div
         initial={{ opacity: 0 }}

@@ -345,7 +345,7 @@ const Onboarding = () => {
 
                   {/* Navigation Controls */}
                   {guidancePhotos.length > 1 && (
-                    <div className="absolute top-8 right-8 z-10 flex items-center gap-4">
+                    <div className="absolute top-8 left-8 z-10 flex items-center gap-4">
                       {/* Number Indicator */}
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-mono text-accent">
