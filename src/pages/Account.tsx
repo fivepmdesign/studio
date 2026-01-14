@@ -1,5 +1,5 @@
 import { motion, useInView } from 'framer-motion';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { AnimatedLine } from '@/components/AnimatedText';
 import { Palette, Code, Megaphone, Lightbulb, BarChart3, Globe, User, LogOut } from 'lucide-react';
@@ -33,56 +33,24 @@ const PLAN_CONFIG = {
   },
 };
 
-// Current plan - switch between 'free', 'pro', 'ultra'
-const CURRENT_PLAN = 'ultra';
+type Plan = 'free' | 'pro' | 'ultra';
 
-const services = [
-  {
-    pill: 'SUBSCRIPTION',
-    title: CURRENT_PLAN === 'free' ? 'Free plan' : PLAN_CONFIG[CURRENT_PLAN as keyof typeof PLAN_CONFIG].name,
-    subtitle: CURRENT_PLAN === 'free' ? 'Try V-TRY for free' : `Your plan renews on ${PLAN_CONFIG[CURRENT_PLAN as keyof typeof PLAN_CONFIG].renewsOn}`,
-    number: '01',
-    width: '1/3',
-    cta: CURRENT_PLAN === 'free' ? 'UPGRADE PLAN' : 'Manage plan',
-    ctaLink: '/upgrade',
-  },
-  {
-    pill: 'CREDITS',
-    title: '10',
-    titleSuffix: `/${PLAN_CONFIG[CURRENT_PLAN as keyof typeof PLAN_CONFIG].creditsTotal}`,
-    subtitle: CURRENT_PLAN === 'free' 
-      ? 'Credits don\'t reset monthly.\nUpgrade to a paid plan to get monthly credits.' 
-      : 'Resets in 19 days',
-    number: '02',
-    width: '2/3',
-    cta: 'ADD MORE CREDITS',
-    ctaLink: CURRENT_PLAN === 'free' ? '/upgrade' : undefined,
-    upgradeCta: CURRENT_PLAN === 'free' ? 'UPGRADE PLAN' : undefined,
-    creditsUsed: 10,
-    creditsTotal: PLAN_CONFIG[CURRENT_PLAN as keyof typeof PLAN_CONFIG].creditsTotal,
-  },
-  {
-    pill: 'UPCOMING INVOICES',
-    title: 'Upcoming Invoices',
-    subtitle: CURRENT_PLAN === 'free' ? 'No invoices available on free plan.' : 'Review and manage your upcoming billing statements.',
-    number: '03',
-    width: '1/2',
-    cta: CURRENT_PLAN === 'free' ? 'UPGRADE PLAN' : 'View all Invoices',
-    ctaLink: CURRENT_PLAN === 'free' ? '/upgrade' : undefined,
-  },
-  {
-    pill: 'PAYMENT METHODS',
-    title: 'Payment Methods',
-    subtitle: CURRENT_PLAN === 'free' ? 'No payment methods on file' : 'Credit card - Stripe',
-    number: '04',
-    width: '1/2',
-    cta: CURRENT_PLAN === 'free' ? 'UPGRADE PLAN' : 'Manage billing information',
-    ctaLink: CURRENT_PLAN === 'free' ? '/upgrade' : undefined,
-  },
-];
+type Service = {
+  pill: string;
+  title: string;
+  titleSuffix?: string;
+  subtitle?: string;
+  number: string;
+  width: string;
+  cta: string;
+  ctaLink?: string;
+  upgradeCta?: string;
+  creditsUsed?: number;
+  creditsTotal?: number;
+};
 
 interface ServiceCardProps {
-  service: typeof services[0] & { ctaLink?: string; upgradeCta?: string };
+  service: Service & { ctaLink?: string; upgradeCta?: string };
   index: number;
   activeIndex: number | null;
   setActiveIndex: (index: number | null) => void;
@@ -319,9 +287,6 @@ const allPersonas = [
   },
 ];
 
-// Show only 1 persona for free plan, all for paid plans
-const personas = CURRENT_PLAN === 'free' ? allPersonas.slice(0, 1) : allPersonas;
-
 const Account = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
@@ -335,6 +300,59 @@ const Account = () => {
   });
   const [isAddPersonaModalOpen, setIsAddPersonaModalOpen] = useState(false);
   
+  // Load settings from localStorage (same as Navigation component)
+  const [currentPlan, setCurrentPlan] = useState<Plan>(() => {
+    const saved = localStorage.getItem('vtry_settings');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return (parsed.plan as Plan) ?? 'free';
+      } catch {
+        return 'free';
+      }
+    }
+    return 'free';
+  });
+  const [userCredits, setUserCredits] = useState<number>(() => {
+    const saved = localStorage.getItem('vtry_settings');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return parsed.tokens ?? 10;
+      } catch {
+        return 10;
+      }
+    }
+    return 10;
+  });
+
+  // Listen for localStorage changes to sync with Navigation component
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const saved = localStorage.getItem('vtry_settings');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed.plan) setCurrentPlan(parsed.plan as Plan);
+          if (parsed.tokens !== undefined) setUserCredits(parsed.tokens);
+        } catch {
+          // Ignore parse errors
+        }
+      }
+    };
+
+    // Listen for storage events (when localStorage is updated from another tab/window)
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also check periodically for changes (for same-tab updates)
+    const interval = setInterval(handleStorageChange, 100);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
+  
   // Mock user data - replace with actual user data from auth
   // In production, get this from your auth system (e.g., user?.imageUrl, user?.photo, etc.)
   // For demo purposes, set to exampleUserPhoto to show the photo feature
@@ -345,11 +363,61 @@ const Account = () => {
   const hasUserPhoto = userPhoto !== null && userPhoto !== undefined;
   
   // Get current plan configuration
-  const currentPlanConfig = PLAN_CONFIG[CURRENT_PLAN as keyof typeof PLAN_CONFIG];
+  const currentPlanConfig = PLAN_CONFIG[currentPlan];
   
   // Credit warning logic - highlight in red if credits are less than 20
-  const creditsCount = services[1].creditsUsed || 0;
-  const isLowCredits = creditsCount < 20;
+  const isLowCredits = userCredits < 20;
+
+  // Generate services array dynamically based on current plan and credits
+  const services = useMemo<Service[]>(() => [
+    {
+      pill: 'SUBSCRIPTION',
+      title: currentPlan === 'free' ? 'Free plan' : PLAN_CONFIG[currentPlan].name,
+      subtitle: currentPlan === 'free' ? 'Try V-TRY for free' : `Your plan renews on ${PLAN_CONFIG[currentPlan].renewsOn}`,
+      number: '01',
+      width: '1/3',
+      cta: currentPlan === 'free' ? 'UPGRADE PLAN' : 'Manage plan',
+      ctaLink: '/upgrade',
+    },
+    {
+      pill: 'CREDITS',
+      title: userCredits.toString(),
+      titleSuffix: `/${PLAN_CONFIG[currentPlan].creditsTotal}`,
+      subtitle: currentPlan === 'free' 
+        ? 'Credits don\'t reset monthly.\nUpgrade to a paid plan to get monthly credits.' 
+        : 'Resets in 19 days',
+      number: '02',
+      width: '2/3',
+      cta: 'ADD MORE CREDITS',
+      ctaLink: currentPlan === 'free' ? '/upgrade' : undefined,
+      upgradeCta: currentPlan === 'free' ? 'UPGRADE PLAN' : undefined,
+      creditsUsed: userCredits,
+      creditsTotal: PLAN_CONFIG[currentPlan].creditsTotal,
+    },
+    {
+      pill: 'UPCOMING INVOICES',
+      title: 'Upcoming Invoices',
+      subtitle: currentPlan === 'free' ? 'No invoices available on free plan.' : 'Review and manage your upcoming billing statements.',
+      number: '03',
+      width: '1/2',
+      cta: currentPlan === 'free' ? 'UPGRADE PLAN' : 'View all Invoices',
+      ctaLink: currentPlan === 'free' ? '/upgrade' : undefined,
+    },
+    {
+      pill: 'PAYMENT METHODS',
+      title: 'Payment Methods',
+      subtitle: currentPlan === 'free' ? 'No payment methods on file' : 'Credit card - Stripe',
+      number: '04',
+      width: '1/2',
+      cta: currentPlan === 'free' ? 'UPGRADE PLAN' : 'Manage billing information',
+      ctaLink: currentPlan === 'free' ? '/upgrade' : undefined,
+    },
+  ], [currentPlan, userCredits]);
+
+  // Show only 1 persona for free plan, all for paid plans
+  const personas = useMemo(() => {
+    return currentPlan === 'free' ? allPersonas.slice(0, 1) : allPersonas;
+  }, [currentPlan]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -688,7 +756,7 @@ const Account = () => {
                   {/* Add New Persona Card */}
                   <motion.button
                     onClick={() => {
-                      if (CURRENT_PLAN === 'free') {
+                      if (currentPlan === 'free') {
                         // Navigate to upgrade page for free plan users
                         window.location.href = '/upgrade';
                       } else {
@@ -731,7 +799,7 @@ const Account = () => {
                       {/* Add Text with Credit Cost */}
                       <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-background/80">
                         <span className="text-sm font-bold uppercase tracking-widest text-foreground mb-2">
-                          {CURRENT_PLAN === 'free' 
+                          {currentPlan === 'free' 
                             ? 'Upgrade to add more personas' 
                             : 'Add New Persona'}
                         </span>

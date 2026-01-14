@@ -1,9 +1,10 @@
 import { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
-import { User } from 'lucide-react';
+import { User, Settings } from 'lucide-react';
 import MagneticButton from './MagneticButton';
 import TopUpModal from './TopUpModal';
+import SettingsModal from './SettingsModal';
 import appIcon from '@/assets/app-icon.svg';
 import exampleUserPhoto from '@/assets/photo.png';
 
@@ -23,30 +24,36 @@ const PLAN_CONFIG = {
   },
 };
 
-// Current plan - switch between 'free', 'pro', 'ultra'
-const CURRENT_PLAN = 'free';
+type Plan = 'free' | 'pro' | 'ultra';
 
-// Base navigation links
-const baseNavLinks = [
+// Navigation links for logged-out users
+const loggedOutNavLinks = [
   { name: 'Pricing', href: '/pricing', number: '01' },
   { name: 'Download', href: '/download', number: '02' },
-  { name: 'Feed', href: '/feed', number: '03' },
   { name: 'Onboarding', href: '/onboarding', number: '04' },
-  { name: 'Account', href: '/account', number: '05' },
 ];
 
-// Add Upgrade link for free and pro plans only
-const getNavLinks = () => {
-  if (CURRENT_PLAN === 'free' || CURRENT_PLAN === 'pro') {
-    return [
-      ...baseNavLinks,
-      { name: 'Upgrade', href: '/upgrade', number: '06' },
-    ];
-  }
-  return baseNavLinks;
-};
+// Navigation links for logged-in users
+const loggedInNavLinks = [
+  { name: 'Feed', href: '/feed', number: '01' },
+  { name: 'Account', href: '/account', number: '02' },
+];
 
-const navLinks = getNavLinks();
+// Get navigation links based on login status and plan
+const getNavLinks = (isLoggedIn: boolean, currentPlan: Plan) => {
+  if (isLoggedIn) {
+    const links = [...loggedInNavLinks];
+    
+    // Add Upgrade link for free and pro plans only (when logged in)
+    if (currentPlan === 'free' || currentPlan === 'pro') {
+      links.push({ name: 'Upgrade', href: '/upgrade', number: '03' });
+    }
+    
+    return links;
+  }
+  
+  return loggedOutNavLinks;
+};
 
 export const Navigation = () => {
   const navRef = useRef<HTMLElement | null>(null);
@@ -54,10 +61,71 @@ export const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [isTopUpModalOpen, setIsTopUpModalOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const location = useLocation();
   
-  // Mock user data - replace with actual user data from auth
-  const userCredits = 10;
+  // Mock user and subscription data - replace with actual data from auth/billing
+  // Load from localStorage on mount, or use defaults
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    const saved = localStorage.getItem('vtry_settings');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return parsed.isLoggedIn ?? false;
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  });
+  const [currentPlan, setCurrentPlan] = useState<Plan>(() => {
+    const saved = localStorage.getItem('vtry_settings');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return (parsed.plan as Plan) ?? 'free';
+      } catch {
+        return 'free';
+      }
+    }
+    return 'free';
+  });
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>(() => {
+    const saved = localStorage.getItem('vtry_settings');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return (parsed.billingPeriod as 'monthly' | 'yearly') ?? 'monthly';
+      } catch {
+        return 'monthly';
+      }
+    }
+    return 'monthly';
+  });
+  const [userCredits, setUserCredits] = useState<number>(() => {
+    const saved = localStorage.getItem('vtry_settings');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return parsed.tokens ?? 10;
+      } catch {
+        return 10;
+      }
+    }
+    return 10;
+  });
+  const [generationsEnabled, setGenerationsEnabled] = useState<boolean>(() => {
+    const saved = localStorage.getItem('vtry_settings');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return parsed.generationsEnabled ?? false;
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  });
   // In production, get this from your auth system (e.g., user?.imageUrl, user?.photo, etc.)
   // For demo purposes, set to exampleUserPhoto to show the photo feature
   // Set to null to show the placeholder icon
@@ -108,6 +176,28 @@ export const Navigation = () => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
 
+  // Save settings to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('vtry_settings', JSON.stringify({
+      isLoggedIn,
+      plan: currentPlan,
+      billingPeriod,
+      tokens: userCredits,
+      generationsEnabled,
+    }));
+  }, [isLoggedIn, currentPlan, billingPeriod, userCredits, generationsEnabled]);
+
+  // Redirect to /feed when user logs in (if not already there)
+  useEffect(() => {
+    if (isLoggedIn) {
+      // Only redirect if we're on a public page
+      const publicPages = ['/', '/pricing', '/download', '/onboarding', '/login'];
+      if (publicPages.includes(location.pathname)) {
+        window.location.href = '/feed';
+      }
+    }
+  }, [isLoggedIn, location.pathname]);
+
   const isActiveLink = (href: string) => location.pathname === href;
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -115,6 +205,8 @@ export const Navigation = () => {
     cursorX.set(e.clientX - rect.left);
     cursorY.set(e.clientY - rect.top);
   };
+
+  const navLinks = getNavLinks(isLoggedIn, currentPlan);
 
   return (
     <>
@@ -138,7 +230,7 @@ export const Navigation = () => {
           }`}>
             
             {/* Logo */}
-            <Link to="/" className="group relative">
+            <Link to={isLoggedIn ? "/feed" : "/"} className="group relative">
               <motion.div
                 className="flex items-center"
                 whileHover={{ scale: 1.02 }}
@@ -229,52 +321,67 @@ export const Navigation = () => {
               <div className={`w-px h-6 mx-4 transition-colors duration-500 ${isScrolled ? 'bg-border/50' : 'bg-transparent'}`} />
               
               <div className="flex items-center gap-2">
-                {/* Credits Button */}
-                <button
-                  onClick={() => setIsTopUpModalOpen(true)}
-                  className={`group relative px-3 py-2.5 border rounded-full bg-background/80 backdrop-blur-sm transition-all duration-300 h-[38px] flex items-center gap-1.5 ${
-                    isLowCredits 
-                      ? 'border-red-500/50 bg-red-500/10 hover:bg-red-500/20 hover:border-red-500' 
-                      : 'border-border hover:bg-accent/10 hover:border-accent'
-                  }`}
-                >
-                  <span className={`text-sm font-mono font-semibold transition-colors ${
-                    isLowCredits 
-                      ? 'text-red-600 dark:text-red-500 group-hover:text-red-600 dark:group-hover:text-red-500' 
-                      : 'text-foreground group-hover:text-accent'
-                  }`}>
-                    {userCredits.toLocaleString()}
-                  </span>
-                  {isLowCredits && (
-                    <span className="text-xs font-mono text-red-600 dark:text-red-500">
-                      remaining
+                {/* Credits Button - Only shown when logged in */}
+                {isLoggedIn && (
+                  <button
+                    onClick={() => setIsTopUpModalOpen(true)}
+                    className={`group relative px-3 py-2.5 border rounded-full bg-background/80 backdrop-blur-sm transition-all duration-300 h-[38px] flex items-center gap-1.5 ${
+                      isLowCredits 
+                        ? 'border-red-500/50 bg-red-500/10 hover:bg-red-500/20 hover:border-red-500' 
+                        : 'border-border hover:bg-accent/10 hover:border-accent'
+                    }`}
+                  >
+                    <span className={`text-sm font-mono font-semibold transition-colors ${
+                      isLowCredits 
+                        ? 'text-red-600 dark:text-red-500 group-hover:text-red-600 dark:group-hover:text-red-500' 
+                        : 'text-foreground group-hover:text-accent'
+                    }`}>
+                      {userCredits.toLocaleString()}
                     </span>
-                  )}
-                </button>
+                    {isLowCredits && (
+                      <span className="text-xs font-mono text-red-600 dark:text-red-500">
+                        remaining
+                      </span>
+                    )}
+                  </button>
+                )}
                 
-                {/* User Photo Circle Button - Clickable to Account */}
-                <Link
-                  to="/account"
-                  className="relative w-[38px] h-[38px] rounded-full bg-accent/20 border-2 border-accent/30 flex items-center justify-center overflow-hidden flex-shrink-0 hover:border-accent hover:bg-accent/30 transition-all duration-300"
-                >
-                  {hasUserPhoto ? (
-                    <img 
-                      src={userPhoto} 
-                      alt="User" 
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <User className="w-4 h-4 text-accent" strokeWidth={2} />
-                  )}
-                </Link>
+                {/* User Photo Circle Button - Only shown when logged in */}
+                {isLoggedIn && (
+                  <Link
+                    to="/account"
+                    className="relative w-[38px] h-[38px] rounded-full bg-accent/20 border-2 border-accent/30 flex items-center justify-center overflow-hidden flex-shrink-0 hover:border-accent hover:bg-accent/30 transition-all duration-300"
+                  >
+                    {hasUserPhoto ? (
+                      <img 
+                        src={userPhoto} 
+                        alt="User" 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <User className="w-4 h-4 text-accent" strokeWidth={2} />
+                    )}
+                  </Link>
+                )}
                 
-                {/* CTA Button */}
+                {/* CTA Button - Only shown when logged out */}
+                {!isLoggedIn && (
                   <Link 
                     to="/login" 
-                  className="px-5 py-2.5 bg-foreground text-background rounded-full text-sm font-semibold hover:bg-accent hover:text-accent-foreground transition-colors duration-300"
-                >
-                  Get started
+                    className="px-5 py-2.5 bg-foreground text-background rounded-full text-sm font-semibold hover:bg-accent hover:text-accent-foreground transition-colors duration-300"
+                  >
+                    Get started
                   </Link>
+                )}
+                
+                {/* Settings Button */}
+                <button
+                  onClick={() => setIsSettingsModalOpen(true)}
+                  className="w-[38px] h-[38px] rounded-full bg-background/80 backdrop-blur-sm border border-border hover:bg-accent/10 hover:border-accent transition-all duration-300 flex items-center justify-center group"
+                  aria-label="Settings"
+                >
+                  <Settings className="w-4 h-4 text-foreground/70 group-hover:text-accent transition-colors" strokeWidth={2} />
+                </button>
               </div>
             </div>
 
@@ -463,92 +570,96 @@ export const Navigation = () => {
                 ))}
               </div>
               
-              {/* Credits and User Pills - Mobile */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                transition={{ delay: 0.4, duration: 0.5 }}
-                className="mt-12 flex items-center gap-3 justify-start"
-              >
-                {/* User Photo Circle Button - Clickable to Account */}
-                <Link
-                  to="/account"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="relative w-[42px] h-[42px] rounded-full bg-accent/20 border-2 border-accent/30 flex items-center justify-center overflow-hidden flex-shrink-0 hover:border-accent hover:bg-accent/30 transition-all duration-300"
+              {/* Credits and User Pills - Mobile - Only shown when logged in */}
+              {isLoggedIn && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ delay: 0.4, duration: 0.5 }}
+                  className="mt-12 flex items-center gap-3 justify-start"
                 >
-                  {hasUserPhoto ? (
-                    <img 
-                      src={userPhoto} 
-                      alt="User" 
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <User className="w-5 h-5 text-accent" strokeWidth={2} />
-                  )}
-                </Link>
-                
-                {/* Credits Button */}
-                <button
-                  onClick={() => {
-                    setIsTopUpModalOpen(true);
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className={`group relative px-6 py-3 border rounded-full bg-background/80 backdrop-blur-sm transition-all duration-300 flex items-center gap-1.5 ${
-                    isLowCredits 
-                      ? 'border-red-500/50 bg-red-500/10 hover:bg-red-500/20 hover:border-red-500' 
-                      : 'border-border hover:bg-accent/10 hover:border-accent'
-                  }`}
-                >
-                  <span className={`text-sm font-mono font-semibold transition-colors ${
-                    isLowCredits 
-                      ? 'text-red-600 dark:text-red-500 group-hover:text-red-600 dark:group-hover:text-red-500' 
-                      : 'text-foreground group-hover:text-accent'
-                  }`}>
-                    {userCredits.toLocaleString()}
-                  </span>
-                  {isLowCredits && (
-                    <span className="text-xs font-mono text-red-600 dark:text-red-500">
-                      remaining
-                    </span>
-                  )}
-                </button>
-              </motion.div>
-              
-              {/* Bottom section */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                transition={{ delay: 0.5, duration: 0.5 }}
-                className="mt-12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6"
-              >
-                <div className="text-sm text-muted-foreground">
-                  <p>Ready to sign up and discover the future of your e-commerce experience?</p>
-                </div>
-                
-                <Link
-                  to="/login"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="group inline-flex items-center gap-3 px-6 py-3 bg-accent text-accent-foreground font-semibold rounded-full"
-                >
-                  Get started
-                  <motion.div
-                    className="w-6 h-6 rounded-full bg-accent-foreground/20 flex items-center justify-center"
-                    whileHover={{ rotate: 45 }}
+                  {/* User Photo Circle Button - Clickable to Account */}
+                  <Link
+                    to="/account"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="relative w-[42px] h-[42px] rounded-full bg-accent/20 border-2 border-accent/30 flex items-center justify-center overflow-hidden flex-shrink-0 hover:border-accent hover:bg-accent/30 transition-all duration-300"
                   >
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                      <path
-                        d="M3 11L11 3M11 3H5M11 3V9"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                    {hasUserPhoto ? (
+                      <img 
+                        src={userPhoto} 
+                        alt="User" 
+                        className="w-full h-full object-cover"
                       />
-                    </svg>
-                  </motion.div>
-                </Link>
-              </motion.div>
+                    ) : (
+                      <User className="w-5 h-5 text-accent" strokeWidth={2} />
+                    )}
+                  </Link>
+                  
+                  {/* Credits Button */}
+                  <button
+                    onClick={() => {
+                      setIsTopUpModalOpen(true);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`group relative px-6 py-3 border rounded-full bg-background/80 backdrop-blur-sm transition-all duration-300 flex items-center gap-1.5 ${
+                      isLowCredits 
+                        ? 'border-red-500/50 bg-red-500/10 hover:bg-red-500/20 hover:border-red-500' 
+                        : 'border-border hover:bg-accent/10 hover:border-accent'
+                    }`}
+                  >
+                    <span className={`text-sm font-mono font-semibold transition-colors ${
+                      isLowCredits 
+                        ? 'text-red-600 dark:text-red-500 group-hover:text-red-600 dark:group-hover:text-red-500' 
+                        : 'text-foreground group-hover:text-accent'
+                    }`}>
+                      {userCredits.toLocaleString()}
+                    </span>
+                    {isLowCredits && (
+                      <span className="text-xs font-mono text-red-600 dark:text-red-500">
+                        remaining
+                      </span>
+                    )}
+                  </button>
+                </motion.div>
+              )}
+              
+              {/* Bottom section - Only shown when logged out */}
+              {!isLoggedIn && (
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  transition={{ delay: 0.5, duration: 0.5 }}
+                  className="mt-12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6"
+                >
+                  <div className="text-sm text-muted-foreground">
+                    <p>Ready to sign up and discover the future of your e-commerce experience?</p>
+                  </div>
+                  
+                  <Link
+                    to="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="group inline-flex items-center gap-3 px-6 py-3 bg-accent text-accent-foreground font-semibold rounded-full"
+                  >
+                    Get started
+                    <motion.div
+                      className="w-6 h-6 rounded-full bg-accent-foreground/20 flex items-center justify-center"
+                      whileHover={{ rotate: 45 }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path
+                          d="M3 11L11 3M11 3H5M11 3V9"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </motion.div>
+                  </Link>
+                </motion.div>
+              )}
             </nav>
           </motion.div>
         )}
@@ -556,6 +667,24 @@ export const Navigation = () => {
       
       {/* Top-Up Modal */}
       <TopUpModal isOpen={isTopUpModalOpen} onClose={() => setIsTopUpModalOpen(false)} />
+      
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={isSettingsModalOpen}
+        onClose={() => setIsSettingsModalOpen(false)}
+        initialIsLoggedIn={isLoggedIn}
+        initialPlan={currentPlan}
+        initialBillingPeriod={billingPeriod}
+        initialTokens={userCredits}
+        initialGenerationsEnabled={generationsEnabled}
+        onSave={({ isLoggedIn, plan, billingPeriod, tokens, generationsEnabled }) => {
+          setIsLoggedIn(isLoggedIn);
+          setCurrentPlan(plan);
+          setBillingPeriod(billingPeriod);
+          setUserCredits(tokens);
+          setGenerationsEnabled(generationsEnabled);
+        }}
+      />
     </>
   );
 };

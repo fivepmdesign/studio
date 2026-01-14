@@ -83,7 +83,7 @@ const Index = () => {
                   <span className="text-sm font-mono text-muted-foreground tracking-wider">HOW IT WORKS</span>
                 </div>
                 <h2 className="text-3xl md:text-5xl font-sans font-bold">
-                  Principles that guide us.
+                  Rethink your e-commerce experience
                 </h2>
               </motion.div>
             </div>

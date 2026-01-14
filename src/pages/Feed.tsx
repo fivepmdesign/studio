@@ -412,11 +412,51 @@ const Feed = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState('');
   const [isLoadingUrl, setIsLoadingUrl] = useState(false);
-  const [hasGenerations, setHasGenerations] = useState(true); // Set to false to show empty state (also controls website tags visibility)
+  // Load generationsEnabled from localStorage (synced with settings modal)
+  const [hasGenerations, setHasGenerations] = useState(() => {
+    const saved = localStorage.getItem('vtry_settings');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return parsed.generationsEnabled ?? false;
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  });
   const [selectedSites, setSelectedSites] = useState<typeof popularFashionSites>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const filterRef = useRef(null);
   const filterInView = useInView(filterRef, { once: true, margin: '-100px' });
+
+  // Listen for localStorage changes to sync with SettingsModal
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const saved = localStorage.getItem('vtry_settings');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed.generationsEnabled !== undefined) {
+            setHasGenerations(parsed.generationsEnabled);
+          }
+        } catch {
+          // Ignore parse errors
+        }
+      }
+    };
+
+    // Listen for storage events (when localStorage is updated from another tab/window)
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also check periodically for changes (for same-tab updates)
+    const interval = setInterval(handleStorageChange, 100);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
 
   // Randomly select 3-5 fashion sites on each page load
   useEffect(() => {
