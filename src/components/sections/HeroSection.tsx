@@ -6,7 +6,7 @@ import heroVideo from '@/assets/v-try.m4v?url';
 
 const words = [
   { text: 'Rethink', number: '01' },
-  { text: 'your', number: '02' },
+  { text: 'the', number: '02' },
   { text: 'e-commerce', number: '03' },
   { text: 'experience', number: '04', accent: true },
 ];
